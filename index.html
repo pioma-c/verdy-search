@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>東京ヴェルディへの最短ルート検索</title>
-  <meta name="description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達するルートを検索できるWebツールです。片方向で1手ずつたどる「連想モード」と「最短ルート検索」に対応。" />
+  <title>東京ヴェルディへのWikipediaルート検索</title>
+  <meta name="description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達するルートを検索できるWebツールです。ゴールが見つかるまで何手でも片方向でたどる「連想モード」と「最短ルート検索」に対応。" />
 
   <!-- =========================================================================
        OGP・X（旧Twitter）カード設定
        公開時は下記の「https://example.com/」をご自身の公開URLに書き換えてください
        ========================================================================= -->
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="東京ヴェルディへの最短ルート検索" />
-  <meta property="og:title" content="東京ヴェルディへの最短ルート検索" />
+  <meta property="og:site_name" content="東京ヴェルディへのWikipediaルート検索" />
+  <meta property="og:title" content="東京ヴェルディへのWikipediaルート検索" />
   <meta property="og:description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達するルートを検索！" />
   <meta property="og:url" content="https://example.com/" />
   <!-- OGP画像を用意した場合はURLを設定してください（推奨: 1200x630px） -->
   <!-- <meta property="og:image" content="https://example.com/ogp.png" /> -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="東京ヴェルディへの最短ルート検索" />
+  <meta name="twitter:title" content="東京ヴェルディへのWikipediaルート検索" />
   <meta name="twitter:description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達するルートを検索！" />
   <!-- <meta name="twitter:image" content="https://example.com/ogp.png" /> -->
 
@@ -105,10 +105,10 @@
         </span>
       </div>
       <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-snug">
-        東京ヴェルディへの最短ルート検索
+        東京ヴェルディへのWikipediaルート検索
       </h1>
       <p class="mt-2 text-sm sm:text-base text-verdy-100 leading-relaxed">
-        好きな言葉からWikipediaの本文リンクをたどり、<strong class="text-white font-bold underline decoration-gold-400 decoration-2 underline-offset-4">東京ヴェルディ</strong>を目指します。片方向で1手ずつ連想する「連想モード」と「最短ルート検索」を切り替えられます。
+        好きな言葉からWikipediaの本文リンクをたどり、<strong class="text-white font-bold underline decoration-gold-400 decoration-2 underline-offset-4">東京ヴェルディ</strong>を目指します。ゴールまで諦めずに1手ずつたどる「連想モード」と「最短ルート検索」を切り替えられます。
       </p>
     </div>
   </header>
@@ -131,7 +131,7 @@
               class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer bg-verdy-600 text-white shadow-sm"
             >
               <span>連想モード</span>
-              <span id="modeAssociationSub" class="text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded bg-white/20 text-verdy-50">片方向・1手ずつ</span>
+              <span id="modeAssociationSub" class="text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded bg-white/20 text-verdy-50">片方向・無制限</span>
             </button>
             <button
               type="button"
@@ -145,7 +145,7 @@
             </button>
           </div>
           <p id="modeDescription" class="mt-2 text-xs text-slate-500 leading-relaxed">
-            出発記事の本文リンクを片方向で1手ずつ連想ゲームのようにたどり、東京ヴェルディを目指します（寄り道あり・毎回変化）。
+            出発記事の本文リンクを片方向で1手ずつ連想ゲームのようにたどり、東京ヴェルディに着くまで何十手でも諦めずに続けます（いつでもキャンセル可能）。
           </p>
         </div>
 
@@ -198,18 +198,18 @@
 
         <!-- フィルタボタン & ランダムボタン行 -->
         <div class="flex flex-wrap items-center justify-between gap-2.5 pt-1">
-          <!-- 「東京都」を除外 トグルボタン（デフォルトON） -->
+          <!-- 「国名・地名を除外」トグルボタン（デフォルトON） -->
           <button
             type="button"
-            id="excludeTokyoBtn"
+            id="excludeGeoBtn"
             role="switch"
             aria-checked="true"
             class="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition cursor-pointer select-none bg-verdy-50 border-verdy-300 text-verdy-800"
           >
-            <span id="excludeTokyoTrack" class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-verdy-600">
-              <span id="excludeTokyoKnob" style="transform: translateX(18px);" class="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"></span>
+            <span id="excludeGeoTrack" class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-verdy-600">
+              <span id="excludeGeoKnob" style="transform: translateX(18px);" class="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"></span>
             </span>
-            <span>「東京都」を除外</span>
+            <span>国名・地名を除外</span>
           </button>
 
           <button
@@ -273,11 +273,14 @@
 
       <!-- 連想モード用：リアルタイム連想チェーン表示 -->
       <div id="liveChainWrap" class="hidden mt-4 pt-3.5 border-t border-slate-100">
-        <div class="text-[11px] font-bold text-verdy-700 mb-2 flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-verdy-500 animate-ping"></span>
-          <span>現在の連想ルート（リアルタイム）：</span>
+        <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+          <div class="text-[11px] font-bold text-verdy-700 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-verdy-500 animate-ping"></span>
+            <span id="liveChainLabel">現在の連想ルート（ゴールまで諦めずに継続中）：</span>
+          </div>
+          <span id="liveChainMeta" class="text-[11px] font-mono text-slate-400"></span>
         </div>
-        <div id="liveChainNodes" class="flex flex-wrap items-center gap-1.5"></div>
+        <div id="liveChainNodes" class="flex flex-wrap items-center gap-1.5 max-h-44 overflow-y-auto pr-1"></div>
       </div>
 
       <div class="grid grid-cols-2 gap-2.5 mt-4 pt-3.5 border-t border-slate-100 text-xs">
@@ -318,7 +321,7 @@
             連想モード
           </span>
           <span id="resultExcludeBadge" class="hidden inline-flex items-center gap-1 bg-white/15 border border-white/25 text-verdy-50 text-xs font-semibold px-2.5 py-1 rounded-full">
-            「東京都」除外
+            国名・地名除外
           </span>
           <span class="inline-flex items-center gap-1 bg-black/20 text-verdy-100 text-xs font-medium px-2.5 py-1 rounded-full">
             本文リンク限定
@@ -413,8 +416,8 @@
         </summary>
         <div class="px-4 sm:px-6 pb-5 pt-1 text-xs sm:text-sm text-slate-600 space-y-2.5 leading-relaxed border-t border-slate-100">
           <p>
-            <strong>1. 連想モード（デフォルト・片方向）：</strong>
-            出発記事の冒頭〜本文前半にある特徴的なリンクから片方向で1手ずつたどり、連想ゲームのように寄り道しながら東京ヴェルディへ着地します。「別の連想を試す」で同じ単語から毎回違うルートを楽しめます。
+            <strong>1. 連想モード（デフォルト・片方向・手数無制限）：</strong>
+            出発記事の冒頭〜本文前半にある特徴的なリンクから片方向で1手ずつたどり、手数上限なしで東京ヴェルディへ着くまで諦めずに連想し続けます。行き止まりに当たった場合は自動で1手戻って別ルートを探し、途中で止めたいときはいつでもキャンセルできます。
           </p>
           <p>
             <strong>2. 最短ルート検索（双方向リアルタイム検索）：</strong>
@@ -422,11 +425,11 @@
           </p>
           <p>
             <strong>3. 本文リンク限定（脚注・折りたたみ一覧表を常時除外）：</strong>
-            WikipediaのHTML構造を解析し、「脚注」「注釈」「出典」「参考文献」セクションや、記事下部の折りたたみ一覧表（ナビゲーションボックス／テンプレート）に含まれるリンクはすべて除外した上で、本文中のリンクだけでつながる経路を検証しています。
+            WikipediaのWikitext構造を解析し、「脚注」「注釈」「出典」「参考文献」セクションや、記事下部の折りたたみ一覧表（ナビゲーションボックス／テンプレート）に含まれるリンクはすべて除外した上で、本文中のリンクだけでつながる経路を検証しています。
           </p>
           <p>
-            <strong>4. 「「東京都」を除外」設定：</strong>
-            デフォルトでONになっており、中継地点として「東京都」を経由しない、より意外性のあるルートを検索します。オフにすると「東京都」経由も含めて検索できます。
+            <strong>4. 「国名・地名を除外」設定：</strong>
+            デフォルトでONになっており、中継地点として日本・アメリカなどの国名や、都道府県・市区町村・海外都市などの地名を経由しない、より意外性のあるルートを検索します。オフにすると国名・地名経由も含めて検索できます。
           </p>
         </div>
       </details>
@@ -473,8 +476,73 @@
       'モーツァルト'
     ];
 
-    // 「「東京都」を除外」ON時に中継から除外するタイトル
-    const EXCLUDED_TOKYO_TITLES = new Set(['東京都', '東京']);
+    // 「国名・地名を除外」ON時に中継から除外する主要な国名・大陸・都道府県・主要都市・地域名
+    const GEO_PLACE_TITLES = new Set([
+      // 大陸・広域地域
+      'アジア', '東アジア', '東南アジア', '南アジア', '西アジア', '中央アジア',
+      'ヨーロッパ', '欧州', '西欧', '東欧', '北欧', '南欧', '中欧',
+      'アフリカ', '北アフリカ', '南アフリカ', 'サブサハラアフリカ',
+      '北アメリカ', '南アメリカ', 'アメリカ大陸', '北米', '南米', '中南米', 'ラテンアメリカ', '中央アメリカ',
+      'オセアニア', 'オーストラリア大陸', 'ユーラシア', 'ユーラシア大陸', '中東', '中近東',
+      '南極', '南極大陸', '北極', '北極圏', 'カリブ海', '地中海', '太平洋', '大西洋', 'インド洋',
+      // 世界の主要国・地域
+      '日本', '大日本帝国', 'アメリカ合衆国', 'アメリカ', '米国',
+      'イギリス', 'グレートブリテン及び北アイルランド連合王国', 'イングランド', 'スコットランド', 'ウェールズ', '北アイルランド',
+      'フランス', 'ドイツ', 'イタリア', 'スペイン', 'ポルトガル', 'オランダ', 'ベルギー', 'スイス',
+      'オーストリア', 'スウェーデン', 'ノルウェー', 'デンマーク', 'フィンランド', 'アイスランド', 'アイルランド',
+      'ポーランド', 'チェコ', 'スロバキア', 'ハンガリー', 'ルーマニア', 'ブルガリア', 'ギリシャ',
+      'ロシア', 'ソビエト連邦', 'ソ連', 'ウクライナ', 'ベラルーシ', 'セルビア', 'クロアチア', 'スロベニア',
+      'ボスニア・ヘルツェゴビナ', 'モンテネグロ', '北マケドニア', 'アルバニア',
+      'エストニア', 'ラトビア', 'リトアニア', 'モルドバ', 'ジョージア', 'アルメニア', 'アゼルバイジャン',
+      'トルコ', 'キプロス', 'マルタ', 'ルクセンブルク', 'モナコ', 'リヒテンシュタイン', 'アンドラ', 'サンマリノ', 'バチカン',
+      '中国', '中華人民共和国', '中華民国', '台湾', '香港', 'マカオ',
+      '韓国', '大韓民国', '朝鮮', '北朝鮮', '朝鮮民主主義人民共和国', 'モンゴル',
+      'タイ', 'ベトナム', 'フィリピン', 'インドネシア', 'マレーシア', 'シンガポール',
+      'ミャンマー', 'カンボジア', 'ラオス', 'ブルネイ', '東ティモール',
+      'インド', 'パキスタン', 'バングラデシュ', 'スリランカ', 'ネパール', 'ブータン', 'モルディブ', 'アフガニスタン',
+      'イラン', 'イラク', 'サウジアラビア', 'アラブ首長国連邦', 'カタール', 'クウェート', 'バーレーン', 'オマーン', 'イエメン',
+      'イスラエル', 'パレスチナ', 'ヨルダン', 'レバノン', 'シリア',
+      'カザフスタン', 'ウズベキスタン', 'トルクメニスタン', 'キルギス', 'タジキスタン',
+      'カナダ', 'メキシコ', 'ブラジル', 'アルゼンチン', 'チリ', 'コロンビア', 'ペルー', 'ベネズエラ',
+      'エクアドル', 'ボリビア', 'パラグアイ', 'ウルグアイ', 'キューバ', 'ジャマイカ', 'ハイチ',
+      'ドミニカ共和国', 'プエルトリコ', 'パナマ', 'コスタリカ', 'グアテマラ', 'ホンジュラス', 'エルサルバドル', 'ニカラグア', 'ベリーズ',
+      'オーストラリア', 'ニュージーランド', 'パプアニューギニア', 'フィジー', 'サモア', 'トンガ', 'パラオ',
+      'エジプト', 'ナイジェリア', 'ケニア', 'エチオピア', 'モロッコ', 'アルジェリア', 'チュニジア', 'リビア', 'スーダン',
+      'ガーナ', 'コートジボワール', 'カメルーン', 'セネガル', 'タンザニア', 'ウガンダ', 'ジンバブエ', 'ザンビア',
+      'アンゴラ', 'モザンビーク', 'マダガスカル', 'マリ', 'ニジェール', 'チャド', 'ナミビア', 'ボツワナ', 'ルワンダ', 'ソマリア',
+      // 日本の47都道府県・主要地域・都市名（接尾辞なし表記含む）
+      '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
+      '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
+      '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県',
+      '三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県',
+      '鳥取県', '島根県', '岡山県', '広島県', '山口県', '徳島県', '香川県', '愛媛県', '高知県',
+      '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県',
+      '東京', '大阪', '京都', '横浜', '名古屋', '神戸', '福岡', '札幌', '仙台', '広島', '沖縄', '琉球',
+      '本州', '四国', '九州', '関東', '関西', '近畿', '東北', '中部', '北陸', '甲信越', '東海', '山陰', '山陽',
+      '首都圏', '京阪神', '多摩', '信州', '蝦夷', '江戸', '鎌倉', '箱根', '日光', '軽井沢',
+      '渋谷', '新宿', '銀座', '秋葉原', '原宿', '池袋', '六本木', '浅草', '上野', '品川', '丸の内', 'お台場',
+      '調布', '稲城', '川崎', '立川', '八王子', '町田', '吉祥寺', '下北沢', '青山', '表参道', '日本橋', '神田',
+      // 海外の主要都市・州・省
+      'ニューヨーク', 'ロサンゼルス', 'シカゴ', 'サンフランシスコ', 'ワシントンD.C.', 'ボストン', 'シアトル', 'ラスベガス',
+      'ハワイ', 'カリフォルニア', 'テキサス', 'フロリダ', 'アラスカ', 'ハリウッド', 'シリコンバレー',
+      'ロンドン', 'パリ', 'ベルリン', 'ミュンヘン', 'フランクフルト', 'ローマ', 'ミラノ', 'ヴェネツィア', 'フィレンツェ', 'ナポリ',
+      'マドリード', 'バルセロナ', 'リスボン', 'アムステルダム', 'ブリュッセル', 'ウィーン', 'チューリッヒ', 'ジュネーブ',
+      'プラハ', 'ブダペスト', 'ワルシャワ', 'モスクワ', 'サンクトペテルブルク', 'イスタンブール', 'アテネ', 'カイロ', 'ドバイ',
+      '北京', '上海', '広州', '深圳', '南京', '西安', '重慶', '成都', '武漢', '天津', '台北', 'ソウル', '釜山', '平壌',
+      '広東省', '江蘇省', '浙江省', '山東省', '四川省', '福建省', '湖北省', '湖南省', '河北省', '河南省', '遼寧省',
+      'バンコク', 'ハノイ', 'ホーチミン', 'マニラ', 'ジャカルタ', 'クアラルンプール', 'デリー', 'ニューデリー', 'ムンバイ',
+      'シドニー', 'メルボルン', 'ブリスベン', 'オークランド', 'トロント', 'バンクーバー', 'モントリオール',
+      'サンパウロ', 'リオデジャネイロ', 'ブエノスアイレス', 'メキシコシティ', 'リマ', 'サンティアゴ', 'ボゴタ', 'ヨハネスブルグ', 'ケープタウン'
+    ]);
+
+    // 地名サフィックス判定で除外したくない普通名詞の例外
+    const NON_GEO_SUFFIX_EXCEPTIONS = new Set([
+      '都市', '大都市', '地方都市', '農村', '漁村', '山村', '寒村', '選手村', '地球村',
+      '下町', '城下町', '門前町', '宿場町', '港町', '温泉町', '学生街', '花町', '寺内町',
+      '朝市', '夜市', '青空市', '自由市', '定期市', '市場', '闇市', '魚市',
+      '選挙区', '特別区', '行政区', '地区', '学区', '管区', '工区', '特区', '自治区', '教区', '保護区', '緩衝区',
+      '中州', '三角州'
+    ]);
 
     // 連想モードの序盤（1〜2手目）で即ワープを避けたい超一般語（連想ゲーム感を高めるため）
     const GENERIC_EARLY_HUBS = new Set([
@@ -484,7 +552,7 @@
       'テレビ', '映画', '音楽', 'スポーツ', '科学', '経済', '政治', '日本テレビ放送網', '読売新聞'
     ]);
 
-    // 日本語版Wikipediaの主要ハブ記事候補（ゴールへの直接リンク有無を起動時にAPI検証する・50件以内）
+    // 日本語版Wikipediaの主要ハブ記事候補（ゴールへの直接リンク有無を起動時にAPI検証する・50件）
     const SUPER_HUB_CANDIDATES = [
       '東京都', '日本プロサッカーリーグ', 'Jリーグ', 'サッカー', '日本テレビ放送網',
       '読売新聞', '読売新聞社', '味の素スタジアム', '日本', '川崎市', '稲城市', '調布市',
@@ -493,17 +561,28 @@
       'アニメ', '音楽', '歴史', '世界', 'オリンピック', 'アメリカ合衆国', 'ブラジル',
       'ヨーロッパ', 'アジア', 'J1リーグ', 'J2リーグ', '神奈川県', '日本サッカー協会',
       '天皇杯 JFA 全日本サッカー選手権大会', 'Jリーグカップ', '国立競技場',
-      '三浦知良', 'ラモス瑠偉', '北澤豪', '読売新聞グループ本社', '日テレ・東京ヴェルディベレーザ'
+      '三浦知良', 'ラモス瑠偉', '北澤豪', '読売新聞グループ本社', '日テレ・東京ヴェルディベレーザ',
+      'プロ野球', 'NHK', 'フジテレビジョン', 'TBSテレビ', 'テレビ朝日'
+    ];
+
+    // 国名・地名以外で東京ヴェルディ周辺のハブ記事へ1手でつながりやすい強力な中継記事群（連想モードの中盤〜終盤の道標）
+    const CLOSE_BRIDGE_HUBS = [
+      'テレビ', 'テレビ番組', 'テレビドラマ', '映画', 'アニメ', '漫画', '新聞', '雑誌', 'ラジオ',
+      'スポーツ', 'オリンピック', '近代オリンピック', 'プロ野球', '野球', '高校野球', 'ラグビー', 'バスケットボール', 'FIFAワールドカップ',
+      'NHK', '日本放送協会', 'フジテレビジョン', 'TBSテレビ', 'テレビ朝日', 'テレビ東京',
+      '読売巨人軍', '朝日新聞', '毎日新聞', '産経新聞', '読売新聞社', '日本テレビ放送網',
+      '20世紀', '21世紀', '昭和', '平成', '令和', '1993年', '1969年',
+      '早稲田大学', '慶應義塾大学', '明治大学', '法政大学', '中央大学', '東京大学', '日本大学', '筑波大学',
+      '京王電鉄', '京王線', '東日本旅客鉄道', '小田急電鉄', '日本国有鉄道',
+      '音楽', 'J-POP', '電通', '吉本興業', 'ソニー', 'トヨタ自動車', '任天堂', 'コカ・コーラ'
     ];
 
     // 3〜4クリック検索および連想モードの収束時に優先したい中継ハブ記事
     const PRIORITY_BRIDGE_HUBS = new Set([
-      '日本', 'スポーツ', 'サッカー', '日本テレビ放送網', '読売新聞', '読売新聞社',
-      'テレビ', '映画', 'アニメ', '音楽', '関東地方', '神奈川県', '川崎市', '調布市',
-      'オリンピック', 'アメリカ合衆国', 'ブラジル', 'ヨーロッパ', 'アジア', '歴史',
-      '1993年', '1969年', '20世紀', '21世紀', '平成', '昭和', '読売巨人軍',
-      'NHK', 'フジテレビジョン', 'TBSテレビ', 'テレビ朝日', 'テレビ東京',
-      '東京都', '東京', 'プロ野球', 'Jリーグ', '日本プロサッカーリーグ'
+      ...CLOSE_BRIDGE_HUBS,
+      '日本', 'サッカー', '読売新聞', '関東地方', '神奈川県', '川崎市', '調布市',
+      'アメリカ合衆国', 'ブラジル', 'ヨーロッパ', 'アジア', '歴史',
+      '東京都', '東京', 'Jリーグ', '日本プロサッカーリーグ'
     ]);
 
     // 本文解析時に丸ごと除外するセクション見出し（脚注・出典系）
@@ -530,12 +609,12 @@
       cachePromise: null,
       isSearching: false,
       abortController: null,
-      excludeTokyo: true,                // デフォルトON
+      excludeGeo: true,                  // デフォルトON（国名・地名を除外）
       searchStartTime: 0,
       elapsedTimer: null,
       apiCalls: 0,
       scannedCount: 0,
-      currentResult: null,               // { mode, startTitle, note, excludeTokyo, routes: string[][], selectedIndex: number }
+      currentResult: null,               // { mode, startTitle, note, excludeGeo, routes: string[][], selectedIndex: number }
       history: [],
       suggestTimer: null,
       suggestActiveIndex: -1,
@@ -562,9 +641,9 @@
       suggestList: document.getElementById('suggestList'),
       searchBtn: document.getElementById('searchBtn'),
       searchBtnLabel: document.getElementById('searchBtnLabel'),
-      excludeTokyoBtn: document.getElementById('excludeTokyoBtn'),
-      excludeTokyoTrack: document.getElementById('excludeTokyoTrack'),
-      excludeTokyoKnob: document.getElementById('excludeTokyoKnob'),
+      excludeGeoBtn: document.getElementById('excludeGeoBtn'),
+      excludeGeoTrack: document.getElementById('excludeGeoTrack'),
+      excludeGeoKnob: document.getElementById('excludeGeoKnob'),
       randomBtn: document.getElementById('randomBtn'),
       presetContainer: document.getElementById('presetContainer'),
       progressPanel: document.getElementById('progressPanel'),
@@ -572,6 +651,8 @@
       progressElapsed: document.getElementById('progressElapsed'),
       progressText: document.getElementById('progressText'),
       liveChainWrap: document.getElementById('liveChainWrap'),
+      liveChainLabel: document.getElementById('liveChainLabel'),
+      liveChainMeta: document.getElementById('liveChainMeta'),
       liveChainNodes: document.getElementById('liveChainNodes'),
       metricApiCalls: document.getElementById('metricApiCalls'),
       metricScanned: document.getElementById('metricScanned'),
@@ -622,9 +703,50 @@
       return state.goalAliases.has(normalizeTitle(title));
     }
 
-    function isExcludedIntermediate(title, excludeTokyo) {
-      if (!excludeTokyo) return false;
-      return EXCLUDED_TOKYO_TITLES.has(normalizeTitle(title));
+    /**
+     * 記事タイトルが国名・地名（都道府県・市区町村・大陸・海外都市・地域名等）かを判定
+     * ※「政府」「鉄道」「柔道」「文部科学省」などの非地名語を誤除外しないよう調整済み
+     */
+    function isGeoPlaceTitle(title) {
+      const norm = normalizeTitle(title);
+      if (!norm) return false;
+
+      const parenMatch = norm.match(/^(.+?)\s*\(([^)]+)\)$/);
+      const baseTitle = parenMatch ? parenMatch[1].trim() : norm;
+      const qualifier = parenMatch ? parenMatch[2].trim() : '';
+
+      if (GEO_PLACE_TITLES.has(norm) || GEO_PLACE_TITLES.has(baseTitle)) {
+        return true;
+      }
+
+      if (qualifier && /^(国|都市|州|省|県|市|区|町|村|地域|地方|島|諸島|半島|日本の地理|地名)$/.test(qualifier)) {
+        return true;
+      }
+
+      if (NON_GEO_SUFFIX_EXCEPTIONS.has(baseTitle)) {
+        return false;
+      }
+
+      // 国名・行政区分・地理名称の接尾辞パターン
+      if (
+        /(?:共和国|王国|公国|大公国|連邦|合衆国|首長国|帝国|自治領|特別行政区|自治区|地方|地域|半島|諸島|列島|群島|平野|盆地|山脈|山地|高原|渓谷|海峡|運河|砂漠)$/.test(baseTitle)
+      ) {
+        return true;
+      }
+
+      // 2文字以上の県・市区町村・郡・州（※都・道・府は47都道府県リストで網羅済み、省は省庁との誤判定防止のため除外）
+      if (baseTitle.length >= 2 && /[県市区町村郡州]$/.test(baseTitle)) {
+        if (/^[一-龥ぁ-んァ-ヶ々ー・]+(?:県|市|区|町|村|郡|州)$/.test(baseTitle)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function isExcludedIntermediate(title, excludeGeo) {
+      if (!excludeGeo) return false;
+      return isGeoPlaceTitle(title);
     }
 
     function isDateOrListTitle(title) {
@@ -638,7 +760,6 @@
     function pickWeightedRandom(items, topLimit = 6) {
       if (!items || items.length === 0) return null;
       const pool = items.slice(0, Math.min(topLimit, items.length));
-      // 先頭ほど選ばれやすい重み付き抽選
       const weights = pool.map((_, idx) => Math.max(1, pool.length - idx));
       const total = weights.reduce((a, b) => a + b, 0);
       let r = Math.random() * total;
@@ -711,30 +832,6 @@
 
     function hideMessage() {
       el.messageBox.classList.add('hidden');
-    }
-
-    /**
-     * 並列数制限つき非同期マップ実行ユーティリティ
-     */
-    async function runWithConcurrency(items, concurrency, worker, signal) {
-      const results = new Array(items.length);
-      let nextIdx = 0;
-
-      const runner = async () => {
-        while (nextIdx < items.length) {
-          if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
-          const idx = nextIdx++;
-          results[idx] = await worker(items[idx], idx);
-        }
-      };
-
-      const workers = [];
-      const count = Math.min(concurrency, items.length);
-      for (let i = 0; i < count; i++) {
-        workers.push(runner());
-      }
-      await Promise.all(workers);
-      return results;
     }
 
     // =========================================================================
@@ -845,7 +942,7 @@
         }
       }
 
-      const maxRetries = 3;
+      const maxRetries = 5;
       let lastStatus = 0;
 
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -868,11 +965,11 @@
             const retryAfterSec = parseInt(res.headers.get('Retry-After') || '', 10);
             const baseDelay = Number.isFinite(retryAfterSec) && retryAfterSec > 0
               ? retryAfterSec * 1000
-              : 2000 * Math.pow(2, attempt) + Math.floor(Math.random() * 500);
-            const delayMs = Math.min(baseDelay, 10000);
+              : 2000 * Math.pow(1.8, attempt) + Math.floor(Math.random() * 500);
+            const delayMs = Math.min(baseDelay, 15000);
 
             // レート制限を検知したら以降の送信間隔も自動で緩める
-            apiLimiter.minIntervalMs = Math.min(1200, Math.max(apiLimiter.minIntervalMs * 1.5, 600));
+            apiLimiter.minIntervalMs = Math.min(1200, Math.max(apiLimiter.minIntervalMs * 1.4, 600));
             apiLimiter.lastRequestTime = Math.max(apiLimiter.lastRequestTime, Date.now() + delayMs);
 
             if (state.isSearching) {
@@ -941,7 +1038,6 @@
             i = j;
             continue;
           }
-          // 対象外テンプレート（基礎情報など）は中身を残しつつ内部の不要テンプレートも再帰的に除去
           out += '{{' + stripTemplatesByPattern(inner, nameRegex) + (depth === 0 ? '}}' : '');
           i = j;
         } else {
@@ -996,7 +1092,6 @@
     /**
      * Wikitextから脚注（<ref>および脚注・出典セクション）と折りたたみ一覧表・テンプレートを除外し、
      * 本文中の標準名前空間リンクのみを出現順に抽出する
-     * ※Wikitextでは記事下部のナビゲーションボックステンプレート（{{...}}）が展開されないため自動で除外される
      */
     function extractCleanBodyLinksFromWikitext(wikitext, selfTitle) {
       if (!wikitext) return new Set();
@@ -1037,7 +1132,7 @@
       }
       text = keptLines.join('\n');
 
-      // 3. 折りたたみブロック（Collapse top / Hidden begin 等）および脚注・ナビ系テンプレートを除去
+      // 3. 折りたたみブロックおよび脚注・ナビ系テンプレートを除去
       text = text.replace(
         /\{\{\s*(?:Collapse top|Collapsed top|Hidden begin|Refbegin)\b[\s\S]*?\{\{\s*(?:Collapse bottom|Collapsed bottom|Hidden end|Refend)\s*\}\}/gi,
         ''
@@ -1070,7 +1165,6 @@
         let title = normalizeTitle(target);
         if (!title) continue;
 
-        // 名前空間プレフィックスおよび他言語版リンク（小文字の en: 等）を除外
         if (
           /^(Wikipedia|WP|Category|Template|File|Image|Portal|Help|Special|Module|MediaWiki|User|Talk|Draft|Book|TimedText|プロジェクト|カテゴリ|テンプレート|ファイル|画像|ポータル|ヘルプ|特別|モジュール|利用者|ノート|議論|wikt|wiktionary|wikisource|wikiquote|wikibooks|wikinews|wikiversity|wikivoyage|commons|meta|species):/i.test(title) ||
           /^[a-z]{2,3}(?:-[a-z0-9]+)?:/.test(title)
@@ -1078,7 +1172,6 @@
           continue;
         }
 
-        // MediaWiki仕様に合わせて先頭のASCII小文字を大文字化
         if (/^[a-z]/.test(title)) {
           title = title[0].toUpperCase() + title.slice(1);
         }
@@ -1092,7 +1185,6 @@
 
     /**
      * 複数記事の「本文リンク（脚注・折りたたみ一覧表を除外）」をWikitext一括取得（action=query）で高速取得
-     * ※action=parse を使わず5記事ずつまとめて取得することで HTTP 429 を大幅に回避する
      */
     async function batchGetCleanBodyLinks(titles, signal) {
       const resultMap = new Map();
@@ -1148,7 +1240,6 @@
           const rev = page.revisions?.[0];
           const hasContent = Boolean(rev && (rev.slots?.main?.content !== undefined || rev.content !== undefined));
 
-          // レスポンスサイズ上限等でrevisionsが返らなかった記事は後続の個別フォールバックへ回す
           if (!page.missing && !page.invalid && !hasContent) {
             continue;
           }
@@ -1174,13 +1265,11 @@
         el.metricScanned.textContent = `${state.scannedCount.toLocaleString()}件`;
       };
 
-      // 5記事ずつ一括取得（action=query のため非常に軽量）
       const chunkSize = 5;
       for (let i = 0; i < uncached.length; i += chunkSize) {
         const chunk = uncached.slice(i, i + chunkSize);
         await fetchChunk(chunk);
 
-        // 長大な記事などで一括取得から漏れたタイトルがあれば個別補完
         for (const key of chunk) {
           if (!state.cleanLinksCache.has(key)) {
             await fetchChunk([key]);
@@ -1247,23 +1336,6 @@
         }
       }
       return verified;
-    }
-
-    /**
-     * 指定記事が「本文リンク」から直接ゴール記事へリンクしているかを裏取り検証
-     */
-    async function verifyCleanLinkToGoal(title, signal) {
-      const key = normalizeTitle(title);
-      if (state.verifiedGoalSources.has(key)) return true;
-      if (state.rejectedGoalSources.has(key)) return false;
-
-      try {
-        const okList = await batchVerifyCleanLinksToGoal([key], signal);
-        return okList.length > 0;
-      } catch (err) {
-        if (err.name === 'AbortError' || err.isRateLimit) throw err;
-        return false;
-      }
     }
 
     /**
@@ -1446,7 +1518,6 @@
         return { title: page.title, note };
       }
 
-      // 完全一致しない場合はWikipedia内検索の上位1件へフォールバック
       const searchData = await wikiFetch(
         {
           action: 'query',
@@ -1479,7 +1550,6 @@
         try {
           el.cacheStatusText.textContent = 'ゴール情報を準備中...';
 
-          // 1. ゴール記事の正規タイトルとリダイレクト別名を取得
           const goalInfo = await wikiFetch(
             {
               action: 'query',
@@ -1502,7 +1572,6 @@
             }
           }
 
-          // 2. 主要ハブからのリンク有無と被リンク（最大1,000件）を順次取得（バースト通信を回避）
           const fetchSuperHubChecks = async () => {
             const targetTitles = Array.from(state.goalAliases).slice(0, 10).join('|');
             const data = await wikiFetch(
@@ -1568,8 +1637,8 @@
     /**
      * 中継候補の優先度ソート（最短ルート検索用）
      */
-    function prioritizeCandidates(titles, excludeTokyo) {
-      const filtered = titles.filter((t) => !isExcludedIntermediate(t, excludeTokyo));
+    function prioritizeCandidates(titles, excludeGeo) {
+      const filtered = titles.filter((t) => !isExcludedIntermediate(t, excludeGeo));
       return filtered.sort((a, b) => {
         const score = (t) => {
           let s = 0;
@@ -1626,8 +1695,16 @@
       if (phase) el.progressPhase.textContent = phase;
     }
 
-    function renderLiveChain(chain, isCompleted = false) {
+    function renderLiveChain(chain, isCompleted = false, backtrackCount = 0) {
       el.liveChainWrap.classList.remove('hidden');
+      const currentSteps = Math.max(0, chain.length - 1);
+      el.liveChainLabel.textContent = isCompleted
+        ? `連想ルート確定（${currentSteps}手）：`
+        : '現在の連想ルート（ゴールまで諦めずに継続中）：';
+      el.liveChainMeta.textContent = backtrackCount > 0
+        ? `現在 ${currentSteps}手目 / 戻り ${backtrackCount}回`
+        : `現在 ${currentSteps}手目`;
+
       const chips = chain.map((title, idx) => {
         const isStart = idx === 0;
         const isLast = idx === chain.length - 1;
@@ -1649,6 +1726,7 @@
         chips.push('<span class="text-slate-400 text-xs font-bold select-none">→</span><span class="inline-flex items-center px-2 py-1 rounded-lg border border-dashed border-verdy-300 text-[11px] font-semibold text-verdy-600 animate-pulse">次を連想中...</span>');
       }
       el.liveChainNodes.innerHTML = chips.join('');
+      el.liveChainNodes.scrollTop = el.liveChainNodes.scrollHeight;
     }
 
     function startProgressUI(mode) {
@@ -1666,12 +1744,9 @@
       el.resultSection.classList.add('hidden');
       hideMessage();
 
-      if (mode === 'association') {
-        el.liveChainWrap.classList.add('hidden');
-        el.liveChainNodes.innerHTML = '';
-      } else {
-        el.liveChainWrap.classList.add('hidden');
-      }
+      el.liveChainWrap.classList.add('hidden');
+      el.liveChainNodes.innerHTML = '';
+      el.liveChainMeta.textContent = '';
 
       clearInterval(state.elapsedTimer);
       state.elapsedTimer = setInterval(() => {
@@ -1709,7 +1784,7 @@
       state.abortController = new AbortController();
       const { signal } = state.abortController;
       const modeAtSearch = options.forceMode || state.searchMode;
-      const excludeTokyoAtSearch = state.excludeTokyo;
+      const excludeGeoAtSearch = state.excludeGeo;
 
       startProgressUI(modeAtSearch);
 
@@ -1742,7 +1817,7 @@
             mode: modeAtSearch,
             startTitle: state.canonicalGoal,
             note: resolved.note,
-            excludeTokyo: excludeTokyoAtSearch,
+            excludeGeo: excludeGeoAtSearch,
             routes: [[state.canonicalGoal]]
           });
           return;
@@ -1752,7 +1827,7 @@
           await executeAssociationMode({
             startTitle,
             note: resolved.note,
-            excludeTokyo: excludeTokyoAtSearch,
+            excludeGeo: excludeGeoAtSearch,
             avoidPreviousFirstHop: Boolean(options.avoidPreviousFirstHop),
             signal
           });
@@ -1760,7 +1835,7 @@
           await executeShortestSearch({
             startTitle,
             note: resolved.note,
-            excludeTokyo: excludeTokyoAtSearch,
+            excludeGeo: excludeGeoAtSearch,
             signal
           });
         }
@@ -1788,14 +1863,14 @@
     }
 
     // =========================================================================
-    // 1. 連想モード（片方向で1手ずつ本文リンクをたどる）
+    // 1. 連想モード（片方向・手数無制限でゴールに着くまで諦めずに継続）
     // =========================================================================
 
-    async function executeAssociationMode({ startTitle, note, excludeTokyo, avoidPreviousFirstHop, signal }) {
-      const MAX_STEPS = 8;
+    async function executeAssociationMode({ startTitle, note, excludeGeo, avoidPreviousFirstHop, signal }) {
       const chain = [startTitle];
       const visited = new Set([startTitle]);
       const deadEnds = new Set();
+      let backtrackCount = 0;
 
       if (!state.usedAssociationFirstHops.has(startTitle)) {
         state.usedAssociationFirstHops.set(startTitle, new Set());
@@ -1805,70 +1880,77 @@
       const getActiveLandingHubs = () =>
         Array.from(state.verifiedDirectHubs).filter(
           (t) =>
-            !isExcludedIntermediate(t, excludeTokyo) &&
+            !isExcludedIntermediate(t, excludeGeo) &&
             !state.rejectedGoalSources.has(t) &&
             !deadEnds.has(t) &&
             !visited.has(t)
         );
 
-      renderLiveChain(chain, false);
+      const getActiveCloseBridges = () =>
+        CLOSE_BRIDGE_HUBS.filter(
+          (t) =>
+            !isExcludedIntermediate(t, excludeGeo) &&
+            !deadEnds.has(t) &&
+            !visited.has(t)
+        );
 
-      let safetyIterations = 0;
-      while (chain.length - 1 < MAX_STEPS && safetyIterations < 14) {
-        safetyIterations += 1;
+      renderLiveChain(chain, false, backtrackCount);
+
+      // 手数上限を設けず、東京ヴェルディ到達またはユーザーキャンセルまで継続
+      while (chain.length > 0) {
         if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
 
         const current = chain[chain.length - 1];
-        const stepNum = chain.length; // これから行うクリック数（1, 2, 3...）
+        const stepNum = chain.length; // これから行うクリック数（1, 2, 3, ..., 20, 30...）
 
-        updateProgress(`「${current}」の本文から次の連想ワードを探しています...`, `連想 ${stepNum}手目`);
+        updateProgress(`「${current}」の本文から次の連想ワードを検索中...`, `連想 ${stepNum}手目`);
         const cleanSet = await getCleanBodyLinks(current, signal);
 
         // 1. 直接ゴール記事へリンクしているかチェック
         for (const alias of state.goalAliases) {
           if (cleanSet.has(alias)) {
             chain.push(state.canonicalGoal);
-            renderLiveChain(chain, true);
+            renderLiveChain(chain, true, backtrackCount);
             await finalizeSearchResult({
               mode: 'association',
               startTitle,
               note,
-              excludeTokyo,
+              excludeGeo,
               routes: [chain]
             });
             return;
           }
         }
 
-        // 本文出現順の候補リストを作成
+        // 本文出現順の候補リストを作成（訪問済み・行き止まり・除外対象を除く）
         const orderedLinks = Array.from(cleanSet).filter(
           (t) =>
             !visited.has(t) &&
             !deadEnds.has(t) &&
             !isGoalTitle(t) &&
-            !isExcludedIntermediate(t, excludeTokyo)
+            !isExcludedIntermediate(t, excludeGeo)
         );
 
-        // 行き止まりの場合は1手戻って別ルートを試す
+        // 行き止まりの場合は1手戻って別ルートを試し続ける
         if (orderedLinks.length === 0) {
-          if (chain.length > 1) {
-            const popped = chain.pop();
-            deadEnds.add(popped);
-            renderLiveChain(chain, false);
-            continue;
-          }
-          break;
+          const popped = chain.pop();
+          deadEnds.add(popped);
+          if (chain.length === 0) break;
+          backtrackCount += 1;
+          updateProgress(`「${popped}」が行き止まりのため、1手戻って別の連想を探しています...`, `連想 ${chain.length}手目`);
+          renderLiveChain(chain, false, backtrackCount);
+          continue;
         }
 
         const nonDateLinks = orderedLinks.filter((t) => !isDateOrListTitle(t));
         const workingLinks = nonDateLinks.length > 0 ? nonDateLinks : orderedLinks;
 
-        // 2. ゴールへ1クリックで届く記事が本文中にあるかチェック
+        // 2. ゴールへ1クリックで届く記事が本文中にあるかチェック（0 API通信で全本文リンクから検出）
         const directGoalBacklinks = workingLinks.filter(
           (t) => state.goalBacklinks.has(t) && !state.rejectedGoalSources.has(t)
         );
 
-        // 1手目では超一般ハブ（日本・日本テレビ・読売新聞など）への即着地を避け、連想ゲーム感を優先する
+        // 1手目では超一般ハブへの即着地を避け、2手目以降は積極的に着地検証する
         const specificGoalBacklinks = directGoalBacklinks.filter((t) => !GENERIC_EARLY_HUBS.has(t));
         const shouldTryLandingNow =
           (stepNum === 1 && specificGoalBacklinks.length > 0 && !avoidPreviousFirstHop) ||
@@ -1885,23 +1967,23 @@
             const chosenMid = verifiedLandings[Math.floor(Math.random() * verifiedLandings.length)];
             if (stepNum === 1) prevFirstHops.add(chosenMid);
             chain.push(chosenMid, state.canonicalGoal);
-            renderLiveChain(chain, true);
+            renderLiveChain(chain, true, backtrackCount);
             await finalizeSearchResult({
               mode: 'association',
               startTitle,
               note,
-              excludeTokyo,
+              excludeGeo,
               routes: [chain]
             });
             return;
           }
         }
 
-        // 3. 次の1手を選ぶ（序盤は記事冒頭の固有語を優先、中盤以降はゴール方向へ緩やかに収束）
+        // 3. 次の1手を選ぶ（序盤は記事冒頭の固有語を優先、中盤〜長丁場はハブ・中継記事へ段階的に引き寄せ）
         let nextTitle = null;
 
         if (stepNum === 1) {
-          // 1手目：記事冒頭〜前半にある、その単語らしい固有キーワードを優先（超一般語・前回使用語は後回し）
+          // 1手目：記事冒頭〜前半にある、その単語らしい固有キーワードを優先
           const leadSlice = workingLinks.slice(0, 40);
           let topicalPool = leadSlice.filter((t) => !GENERIC_EARLY_HUBS.has(t) && !prevFirstHops.has(t));
           if (topicalPool.length === 0) {
@@ -1915,18 +1997,17 @@
             topicalPool = workingLinks;
           }
 
-          // 冒頭上位から少しランダム性を持たせて選ぶ
           const candidateSlice = topicalPool.slice(0, Math.min(18, topicalPool.length));
           nextTitle = pickWeightedRandom(candidateSlice, 10);
           if (nextTitle) prevFirstHops.add(nextTitle);
         } else if (stepNum === 2) {
-          // 2手目：1回だけ軽量照合し、面白いつながり先があれば優先、なければ冒頭寄りから連想を進める
+          // 2手目：1回だけ軽量照合し、面白い着地先があれば程よく寄せつつ連想を広げる
           const activeHubs = getActiveLandingHubs();
           const sampleForCheck = workingLinks
             .filter((t) => !GENERIC_EARLY_HUBS.has(t))
             .slice(0, 35);
 
-          let steered = [];
+          const steered = [];
           if (sampleForCheck.length > 0 && activeHubs.length > 0) {
             const matchMap = await batchCheckLinksToTargets(sampleForCheck, activeHubs, signal);
             for (const cand of sampleForCheck) {
@@ -1946,9 +2027,17 @@
             nextTitle = pickWeightedRandom(pool.length > 0 ? pool : workingLinks, 10);
           }
         } else {
-          // 3手目以降：東京ヴェルディへ自然に着地できるよう、1回の軽量照合で着地ハブへつながるリンクを優先
+          // 3手目以降（何十手でも継続）：
+          // まず本文リンクの中から「冒頭寄り + 中継ハブ優先」で最大50件を抽出し、1回の軽量APIで着地ハブ接続を照合
           const activeHubs = getActiveLandingHubs();
-          const sampleForCheck = workingLinks.slice(0, 45);
+          const bridgePriority = workingLinks.filter((t) => PRIORITY_BRIDGE_HUBS.has(t));
+          const sampleSet = new Set();
+          for (const t of bridgePriority.slice(0, 15)) sampleSet.add(t);
+          for (const t of workingLinks) {
+            if (sampleSet.size >= 50) break;
+            sampleSet.add(t);
+          }
+          const sampleForCheck = Array.from(sampleSet);
 
           if (sampleForCheck.length > 0 && activeHubs.length > 0) {
             updateProgress(`「${current}」から東京ヴェルディへ近づく連想先を検索中...`, `連想 ${stepNum}手目`);
@@ -1960,7 +2049,7 @@
               if (hits.length > 0) {
                 const specificBonus = !GENERIC_EARLY_HUBS.has(cand) ? 4 : 0;
                 const hitBonus = hits.some((h) => !GENERIC_EARLY_HUBS.has(h)) ? 4 : 1;
-                const posBonus = Math.max(0, 3 - idx * 0.08);
+                const posBonus = Math.max(0, 3 - idx * 0.06);
                 scored.push({ title: cand, score: specificBonus + hitBonus + posBonus + Math.random() * 1.5 });
               }
             }
@@ -1970,38 +2059,67 @@
             }
           }
 
-          // まだ着地ハブに届かない場合は中継ハブ経由で日本・スポーツ・メディア圏へ寄せる
-          if (!nextTitle) {
-            const bridgeInLinks = workingLinks.filter((t) => PRIORITY_BRIDGE_HUBS.has(t));
-            if (bridgeInLinks.length > 0) {
-              nextTitle = pickWeightedRandom(bridgeInLinks, 5);
-            } else {
-              nextTitle = pickWeightedRandom(workingLinks.slice(0, 15), 8);
+          // 着地ハブに直接つながる記事がまだなければ、本文中の有力中継ハブ（メディア・スポーツ・年代・大学など）を選ぶ
+          if (!nextTitle && bridgePriority.length > 0) {
+            nextTitle = pickWeightedRandom(bridgePriority, 5);
+          }
+
+          // 5手目以降でまだ有力中継ハブにも当たらない場合は、1回の軽量APIで「中継ハブへつながる記事」を検索して引き寄せる
+          if (!nextTitle && stepNum >= 5 && sampleForCheck.length > 0) {
+            const closeBridges = getActiveCloseBridges();
+            if (closeBridges.length > 0) {
+              updateProgress(`「${current}」からスポーツ・メディア圏へつながる連想先を検索中...`, `連想 ${stepNum}手目`);
+              const bridgeMatchMap = await batchCheckLinksToTargets(sampleForCheck, closeBridges.slice(0, 50), signal);
+              const bridgeScored = [];
+              for (let idx = 0; idx < sampleForCheck.length; idx++) {
+                const cand = sampleForCheck[idx];
+                const hits = bridgeMatchMap.get(cand) || [];
+                if (hits.length > 0) {
+                  bridgeScored.push({ title: cand, score: hits.length * 2 + Math.random() * 1.5 });
+                }
+              }
+              if (bridgeScored.length > 0) {
+                bridgeScored.sort((a, b) => b.score - a.score);
+                nextTitle = pickWeightedRandom(bridgeScored.map((s) => s.title), 4);
+              }
             }
+          }
+
+          // それでもまだ遠い専門領域にいる場合は、短い一般的概念になりやすい未訪問リンクを優先して一歩進める
+          if (!nextTitle) {
+            const broadCandidates = [...workingLinks].sort((a, b) => {
+              const lenDiff = a.length - b.length;
+              return lenDiff !== 0 ? lenDiff : 0;
+            });
+            const mixPool = [
+              ...workingLinks.slice(0, 10),
+              ...broadCandidates.slice(0, 10)
+            ];
+            const uniquePool = Array.from(new Set(mixPool));
+            nextTitle = pickWeightedRandom(uniquePool, 10);
           }
         }
 
         if (!nextTitle) {
-          if (chain.length > 1) {
-            const popped = chain.pop();
-            deadEnds.add(popped);
-            renderLiveChain(chain, false);
-            continue;
-          }
-          break;
+          const popped = chain.pop();
+          deadEnds.add(popped);
+          if (chain.length === 0) break;
+          backtrackCount += 1;
+          renderLiveChain(chain, false, backtrackCount);
+          continue;
         }
 
         chain.push(nextTitle);
         visited.add(nextTitle);
-        renderLiveChain(chain, false);
+        renderLiveChain(chain, false, backtrackCount);
       }
 
-      // 規定手数内に着地できなかった場合
-      const excludeText = excludeTokyo ? '（「東京都」除外）' : '';
+      // たどれる本文リンクをすべて掘り尽くしても到達できなかった場合（孤立記事など）
+      const excludeText = excludeGeo ? '（国名・地名除外）' : '';
       showMessage(
         'warning',
-        `${MAX_STEPS}手以内の連想でゴールに届きませんでした`,
-        `「${startTitle}」からの連想ルート（${chain.join(' → ')}）では${MAX_STEPS}手以内に東京ヴェルディへ到達できませんでした${excludeText}。もう一度ボタンを押して別の連想を試すか、「最短ルート検索」タブもお試しください。`
+        'たどれる本文リンクをすべて確認しましたがゴールに到達できませんでした',
+        `「${startTitle}」から本文リンク限定${excludeText}で到達可能な範囲をすべて確認しましたが、東京ヴェルディにつながる経路が見つかりませんでした。${excludeGeo ? '「国名・地名を除外」をOFFにしてお試しください。' : '別のキーワードをお試しください。'}`
       );
     }
 
@@ -2009,8 +2127,8 @@
     // 2. 最短ルート検索（0〜4クリック・双方向リアルタイム・本文リンク限定）
     // =========================================================================
 
-    async function executeShortestSearch({ startTitle, note, excludeTokyo, signal }) {
-      // Step 1: 1クリック検索（出発記事の本文リンクを取得・脚注と一覧表を除外）
+    async function executeShortestSearch({ startTitle, note, excludeGeo, signal }) {
+      // Step 1: 1クリック検索
       updateProgress(`「${startTitle}」の本文リンク（脚注・一覧除外）を解析中...`, '1クリック検索');
       const startCleanSet = await getCleanBodyLinks(startTitle, signal);
 
@@ -2020,7 +2138,7 @@
             mode: 'shortest',
             startTitle,
             note,
-            excludeTokyo,
+            excludeGeo,
             routes: [[startTitle, state.canonicalGoal]]
           });
           return;
@@ -2028,19 +2146,19 @@
       }
 
       const allowedLevel1Links = Array.from(startCleanSet).filter(
-        (t) => t !== startTitle && !isGoalTitle(t) && !isExcludedIntermediate(t, excludeTokyo)
+        (t) => t !== startTitle && !isGoalTitle(t) && !isExcludedIntermediate(t, excludeGeo)
       );
 
       if (allowedLevel1Links.length === 0) {
         showMessage(
           'warning',
           '本文中にたどれるリンクが見つかりませんでした',
-          `「${startTitle}」の本文領域（脚注・一覧表を除く）に他のWikipedia記事へのリンクが見つかりませんでした。`
+          `「${startTitle}」の本文領域（脚注・一覧表を除く${excludeGeo ? '・国名・地名除外' : ''}）に他のWikipedia記事へのリンクが見つかりませんでした。`
         );
         return;
       }
 
-      // Step 2: 2クリック検索（出発 → [中継A] → 東京ヴェルディ）
+      // Step 2: 2クリック検索
       updateProgress('2クリックで到達できるルートを照合・本文検証中...', '2クリック検索');
 
       const twoHopCandidates = allowedLevel1Links.filter((t) => state.goalBacklinks.has(t));
@@ -2052,17 +2170,17 @@
             mode: 'shortest',
             startTitle,
             note,
-            excludeTokyo,
+            excludeGeo,
             routes
           });
           return;
         }
       }
 
-      // Step 3: 3クリック検索（出発 → [中継A] → [中継B] → 東京ヴェルディ）
-      const prioritizedL1 = prioritizeCandidates(allowedLevel1Links, excludeTokyo);
+      // Step 3: 3クリック検索
+      const prioritizedL1 = prioritizeCandidates(allowedLevel1Links, excludeGeo);
       const activeDirectHubs = Array.from(state.verifiedDirectHubs).filter(
-        (t) => !isExcludedIntermediate(t, excludeTokyo) && !state.rejectedGoalSources.has(t)
+        (t) => !isExcludedIntermediate(t, excludeGeo) && !state.rejectedGoalSources.has(t)
       );
 
       const verifyThreeHopPairs = async (pairs, maxPairsToCheck, maxRoutesNeeded) => {
@@ -2074,7 +2192,6 @@
           if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
           const batch = pairs.slice(i, i + 4);
 
-          // バッチ内の中継A・中継Bの本文を一括取得してAPI通信回数を最小化
           const midAs = Array.from(new Set(batch.map((p) => p.midA)));
           const cleanAMap = await batchGetCleanBodyLinks(midAs, signal);
 
@@ -2113,7 +2230,7 @@
           const matchedHubs = hubMatchMap.get(midA) || [];
           for (const midB of matchedHubs) {
             if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
-            if (isExcludedIntermediate(midB, excludeTokyo)) continue;
+            if (isExcludedIntermediate(midB, excludeGeo)) continue;
             const pairKey = `${midA}>>>${midB}`;
             if (!seenFast.has(pairKey)) {
               seenFast.add(pairKey);
@@ -2138,7 +2255,7 @@
               mode: 'shortest',
               startTitle,
               note,
-              excludeTokyo,
+              excludeGeo,
               routes: verifiedFastRoutes
             });
             return;
@@ -2159,7 +2276,7 @@
         const outLinks = l1OutgoingMap.get(midA) || [];
         for (const midB of outLinks) {
           if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
-          if (isExcludedIntermediate(midB, excludeTokyo)) continue;
+          if (isExcludedIntermediate(midB, excludeGeo)) continue;
 
           if (state.goalBacklinks.has(midB)) {
             const pairKey = `${midA}>>>${midB}`;
@@ -2188,14 +2305,14 @@
             mode: 'shortest',
             startTitle,
             note,
-            excludeTokyo,
+            excludeGeo,
             routes: verifiedThreeHopRoutes
           });
           return;
         }
       }
 
-      // Step 4: 4クリック検索（出発 → [A] → [B] → [C] → 東京ヴェルディ）
+      // Step 4: 4クリック検索
       updateProgress('4クリックルートを検索中（主要ハブを経由して検索）...', '4クリック検索');
 
       const topMidAs = l1ToExpand.slice(0, 12);
@@ -2206,7 +2323,7 @@
         const outA = l1OutgoingMap.get(midA) || [];
         for (const midB of outA) {
           if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
-          if (isExcludedIntermediate(midB, excludeTokyo)) continue;
+          if (isExcludedIntermediate(midB, excludeGeo)) continue;
           if (!l2ParentMap.has(midB)) {
             l2ParentMap.set(midB, midA);
             l2Candidates.push(midB);
@@ -2214,7 +2331,7 @@
         }
       }
 
-      const prioritizedL2 = prioritizeCandidates(l2Candidates, excludeTokyo).slice(0, 50);
+      const prioritizedL2 = prioritizeCandidates(l2Candidates, excludeGeo).slice(0, 50);
       const fourHopCandidates = [];
 
       if (prioritizedL2.length > 0 && activeDirectHubs.length > 0) {
@@ -2224,7 +2341,7 @@
           const matchedC = l2HubMap.get(midB) || [];
           for (const midC of matchedC) {
             if (midC === startTitle || midC === midA || midC === midB || isGoalTitle(midC)) continue;
-            if (isExcludedIntermediate(midC, excludeTokyo)) continue;
+            if (isExcludedIntermediate(midC, excludeGeo)) continue;
             fourHopCandidates.push({ midA, midB, midC });
             if (fourHopCandidates.length >= 16) break;
           }
@@ -2240,7 +2357,7 @@
           const outB = l2OutgoingMap.get(midB) || [];
           for (const midC of outB) {
             if (midC === startTitle || midC === midA || midC === midB || isGoalTitle(midC)) continue;
-            if (isExcludedIntermediate(midC, excludeTokyo)) continue;
+            if (isExcludedIntermediate(midC, excludeGeo)) continue;
             if (state.goalBacklinks.has(midC)) {
               fourHopCandidates.push({ midA, midB, midC });
               if (fourHopCandidates.length >= 16) break;
@@ -2290,19 +2407,18 @@
             mode: 'shortest',
             startTitle,
             note,
-            excludeTokyo,
+            excludeGeo,
             routes: verifiedFourHopRoutes
           });
           return;
         }
       }
 
-      // 4クリック以内で見つからなかった場合
-      const excludeText = excludeTokyo ? '（「東京都」も除外）' : '';
+      const excludeText = excludeGeo ? '（国名・地名も除外）' : '';
       showMessage(
         'warning',
         '4クリック以内のルートが見つかりませんでした',
-        `「${startTitle}」から本文リンク限定${excludeText}で4クリック以内に「${state.canonicalGoal}」へ到達する経路を発見できませんでした。${excludeTokyo ? '「「東京都」を除外」をOFFにするか、' : ''}「連想モード」または別のキーワードをお試しください。`
+        `「${startTitle}」から本文リンク限定${excludeText}で4クリック以内に「${state.canonicalGoal}」へ到達する経路を発見できませんでした。${excludeGeo ? '「国名・地名を除外」をOFFにするか、' : ''}手数無制限の「連想モード」もお試しください。`
       );
     }
 
@@ -2310,58 +2426,66 @@
     // 記事メタデータ取得 & 結果レンダリング
     // =========================================================================
 
+    /**
+     * 何十手もの長いルートでも全カードの概要・サムネイルを取得できるよう15件ずつ分割取得
+     */
     async function fetchArticleSummaries(titles) {
       const unique = Array.from(new Set(titles)).filter((t) => !state.articleInfoCache.has(t));
       if (unique.length === 0) return;
 
-      try {
-        const data = await wikiFetch(
-          {
-            action: 'query',
-            titles: unique.join('|'),
-            prop: 'pageimages|extracts',
-            pithumbsize: '160',
-            exintro: '1',
-            explaintext: '1',
-            exsentences: '2',
-            redirects: '1'
-          },
-          null,
-          false
-        );
+      const chunkSize = 15;
+      for (let i = 0; i < unique.length; i += chunkSize) {
+        const chunk = unique.slice(i, i + chunkSize);
+        try {
+          const data = await wikiFetch(
+            {
+              action: 'query',
+              titles: chunk.join('|'),
+              prop: 'pageimages|extracts',
+              pithumbsize: '160',
+              exintro: '1',
+              explaintext: '1',
+              exsentences: '2',
+              exlimit: String(chunk.length),
+              redirects: '1'
+            },
+            null,
+            false
+          );
 
-        const pages = data?.query?.pages || [];
-        const byTitle = new Map();
-        for (const p of pages) {
-          byTitle.set(p.title, {
-            title: p.title,
-            extract: (p.extract || '').trim() || 'Wikipediaの記事ページで詳細を確認できます。',
-            thumbnail: p.thumbnail?.source || null,
-            url: wikiArticleUrl(p.title)
-          });
-        }
+          const pages = data?.query?.pages || [];
+          const byTitle = new Map();
+          for (const p of pages) {
+            byTitle.set(p.title, {
+              title: p.title,
+              extract: (p.extract || '').trim() || 'Wikipediaの記事ページで詳細を確認できます。',
+              thumbnail: p.thumbnail?.source || null,
+              url: wikiArticleUrl(p.title)
+            });
+          }
 
-        const redirects = new Map();
-        for (const r of data?.query?.redirects || []) {
-          redirects.set(r.from, r.to);
-        }
+          const redirects = new Map();
+          for (const r of data?.query?.redirects || []) {
+            redirects.set(r.from, r.to);
+          }
 
-        for (const t of unique) {
-          const target = redirects.get(t) || t;
-          const info = byTitle.get(target) || {
-            title: t,
-            extract: 'Wikipediaの記事ページで詳細を確認できます。',
-            thumbnail: null,
-            url: wikiArticleUrl(t)
-          };
-          state.articleInfoCache.set(t, info);
+          for (const t of chunk) {
+            const target = redirects.get(t) || t;
+            const info = byTitle.get(target) || {
+              title: t,
+              extract: 'Wikipediaの記事ページで詳細を確認できます。',
+              thumbnail: null,
+              url: wikiArticleUrl(t)
+            };
+            state.articleInfoCache.set(t, info);
+          }
+        } catch (err) {
+          console.warn('記事概要の取得に失敗（フォールバック表示）:', err);
         }
-      } catch (err) {
-        console.warn('記事概要の取得に失敗（フォールバック表示）:', err);
       }
     }
 
-    async function finalizeSearchResult({ mode, startTitle, note, excludeTokyo, routes }) {
+    async function finalizeSearchResult({ mode, startTitle, note, excludeGeo, routes }) {
       updateProgress('見つかったルートの記事情報を取得中...', '結果表示');
 
       const allTitles = routes.flat();
@@ -2371,7 +2495,7 @@
         mode: mode || 'association',
         startTitle,
         note: note || '',
-        excludeTokyo: Boolean(excludeTokyo),
+        excludeGeo: Boolean(excludeGeo),
         routes,
         selectedIndex: 0
       };
@@ -2391,7 +2515,7 @@
       el.resultClicksBadge.textContent = clicks === 0 ? '0クリック（ゴール記事そのもの！）' : `${clicks}クリックで到達！`;
       el.resultModeBadge.textContent = isAssoc ? '連想モード（片方向）' : '最短ルート検索';
 
-      if (res.excludeTokyo) {
+      if (res.excludeGeo) {
         el.resultExcludeBadge.classList.remove('hidden');
       } else {
         el.resultExcludeBadge.classList.add('hidden');
@@ -2414,14 +2538,12 @@
 
       el.resultPathSummary.textContent = route.join(' → ');
 
-      // 連想モード時は「別の連想を試す」ボタンを表示（0クリック時を除く）
       if (isAssoc && clicks > 0) {
         el.retryAssociationBtn.classList.remove('hidden');
       } else {
         el.retryAssociationBtn.classList.add('hidden');
       }
 
-      // 別ルート切り替えボタン（最短ルート検索で複数候補がある場合）
       if (res.routes.length > 1) {
         el.altRoutesBar.classList.remove('hidden');
         el.altRoutesButtons.innerHTML = res.routes
@@ -2437,7 +2559,6 @@
         el.altRoutesBar.classList.add('hidden');
       }
 
-      // ルートカード描画
       const cardsHtml = route
         .map((title, idx) => {
           const info = state.articleInfoCache.get(title) || {
@@ -2518,7 +2639,7 @@
     }
 
     // =========================================================================
-    // シェア・コピー機能（公開URL自動付与対応）
+    // シェア・コピー機能（公開URL自動付与・中略なし全ルート表示）
     // =========================================================================
 
     function buildShareText(includeUrlInline) {
@@ -2526,27 +2647,18 @@
       if (!res || !res.routes || res.routes.length === 0) return '';
       const route = res.routes[res.selectedIndex] || res.routes[0];
       const clicks = Math.max(0, route.length - 1);
-      const isAssoc = res.mode === 'association';
 
-      const flags = [];
-      if (isAssoc) flags.push('連想モード');
-      if (res.excludeTokyo) flags.push('「東京都」除外');
-      const modeLine = flags.length > 0 ? `（※${flags.join('・')}）\n` : '';
+      const header = clicks === 0
+        ? `「${res.startTitle}」は0クリックで東京ヴェルディ！`
+        : `「${res.startTitle}」から${clicks}クリックで東京ヴェルディに到達！`;
 
-      let header = '';
-      if (clicks === 0) {
-        header = `「${res.startTitle}」は0クリックで東京ヴェルディ！`;
-      } else if (isAssoc) {
-        header = `「${res.startTitle}」から${clicks}クリックの連想で東京ヴェルディに到達！`;
-      } else {
-        header = `「${res.startTitle}」から${clicks}クリックで東京ヴェルディに到達！`;
-      }
+      const routeLine = route.join(' → ');
 
       const lines = [
         header,
-        `${modeLine}${route.join(' → ')}`,
+        routeLine,
         '',
-        '#東京ヴェルディ #東京ヴェルディへの最短ルート検索'
+        '#東京ヴェルディ #東京ヴェルディへのWikipediaルート検索'
       ];
 
       if (includeUrlInline) {
@@ -2562,6 +2674,15 @@
     function copyCurrentResult() {
       const text = buildShareText(true);
       if (!text) return;
+
+      const onCopied = () => {
+        el.copyResultBtnLabel.textContent = 'コピーしました！';
+        clearTimeout(copyLabelTimer);
+        copyLabelTimer = setTimeout(() => {
+          el.copyResultBtnLabel.textContent = '結果をコピー';
+        }, 2000);
+        showToast('検索結果をクリップボードにコピーしました');
+      };
 
       let copied = false;
       try {
@@ -2581,23 +2702,12 @@
       }
 
       if (copied) {
-        el.copyResultBtnLabel.textContent = 'コピーしました！';
-        clearTimeout(copyLabelTimer);
-        copyLabelTimer = setTimeout(() => {
-          el.copyResultBtnLabel.textContent = '結果をコピー';
-        }, 2000);
-        showToast('検索結果をクリップボードにコピーしました');
+        onCopied();
       } else if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => {
-          el.copyResultBtnLabel.textContent = 'コピーしました！';
-          clearTimeout(copyLabelTimer);
-          copyLabelTimer = setTimeout(() => {
-            el.copyResultBtnLabel.textContent = '結果をコピー';
-          }, 2000);
-          showToast('検索結果をクリップボードにコピーしました');
-        }).catch(() => {
-          showToast('コピーに失敗しました');
-        });
+        navigator.clipboard
+          .writeText(text)
+          .then(onCopied)
+          .catch(() => showToast('コピーに失敗しました'));
       } else {
         showToast('コピーに失敗しました');
       }
@@ -2633,7 +2743,7 @@
         el.modeAssociationSub.className = 'text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded bg-white/20 text-verdy-50';
         el.modeShortestBtn.className = 'flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer text-slate-600 hover:text-slate-800 hover:bg-white/60';
         el.modeShortestSub.className = 'text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-500';
-        el.modeDescription.textContent = '出発記事の本文リンクを片方向で1手ずつ連想ゲームのようにたどり、東京ヴェルディを目指します（寄り道あり・毎回変化）。';
+        el.modeDescription.textContent = '出発記事の本文リンクを片方向で1手ずつ連想ゲームのようにたどり、東京ヴェルディに着くまで何十手でも諦めずに続けます（いつでもキャンセル可能）。';
         el.searchBtnLabel.textContent = '連想をスタート';
       } else {
         el.modeAssociationBtn.className = 'flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer text-slate-600 hover:text-slate-800 hover:bg-white/60';
@@ -2651,7 +2761,6 @@
       updateSearchModeUI();
       showToast(newMode === 'association' ? '連想モードに切り替えました' : '最短ルート検索に切り替えました');
 
-      // すでに結果が表示されていて検索中でなければ、新モードで自動再検索
       if (!state.isSearching && state.currentResult && state.currentResult.startTitle) {
         runSearch(state.currentResult.startTitle);
       }
@@ -2739,18 +2848,18 @@
       }
     }
 
-    function updateExcludeTokyoButtonUI() {
-      const isOn = state.excludeTokyo;
-      el.excludeTokyoBtn.setAttribute('aria-checked', String(isOn));
+    function updateExcludeGeoButtonUI() {
+      const isOn = state.excludeGeo;
+      el.excludeGeoBtn.setAttribute('aria-checked', String(isOn));
 
       if (isOn) {
-        el.excludeTokyoBtn.className = 'inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition cursor-pointer select-none bg-verdy-50 border-verdy-300 text-verdy-800';
-        el.excludeTokyoTrack.className = 'relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-verdy-600';
-        el.excludeTokyoKnob.style.transform = 'translateX(18px)';
+        el.excludeGeoBtn.className = 'inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition cursor-pointer select-none bg-verdy-50 border-verdy-300 text-verdy-800';
+        el.excludeGeoTrack.className = 'relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-verdy-600';
+        el.excludeGeoKnob.style.transform = 'translateX(18px)';
       } else {
-        el.excludeTokyoBtn.className = 'inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition cursor-pointer select-none bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100';
-        el.excludeTokyoTrack.className = 'relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-slate-300';
-        el.excludeTokyoKnob.style.transform = 'translateX(2px)';
+        el.excludeGeoBtn.className = 'inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition cursor-pointer select-none bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100';
+        el.excludeGeoTrack.className = 'relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-slate-300';
+        el.excludeGeoKnob.style.transform = 'translateX(2px)';
       }
     }
 
@@ -2793,7 +2902,7 @@
         startTitle: result.startTitle,
         clicks: Math.max(0, route.length - 1),
         route,
-        excludeTokyo: result.excludeTokyo,
+        excludeGeo: Boolean(result.excludeGeo),
         timestamp: Date.now()
       };
 
@@ -2804,7 +2913,7 @@
             !(
               item.startTitle === entry.startTitle &&
               item.mode === entry.mode &&
-              item.excludeTokyo === entry.excludeTokyo &&
+              Boolean(item.excludeGeo ?? item.excludeTokyo) === entry.excludeGeo &&
               (item.route || []).join('->') === route.join('->')
             )
         )
@@ -2841,6 +2950,7 @@
       el.historyList.innerHTML = state.history
         .map((item, idx) => {
           const isAssoc = item.mode === 'association';
+          const isExcludeGeo = Boolean(item.excludeGeo ?? item.excludeTokyo);
           const modePill = isAssoc
             ? '<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">連想モード</span>'
             : '<span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">最短ルート</span>';
@@ -2852,7 +2962,7 @@
                 <span class="font-bold text-sm text-slate-800">${escapeHtml(item.startTitle)}</span>
                 <span class="text-[11px] font-bold bg-verdy-100 text-verdy-800 px-2 py-0.5 rounded-full">${item.clicks}クリック</span>
                 ${modePill}
-                ${item.excludeTokyo ? '<span class="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">「東京都」除外</span>' : ''}
+                ${isExcludeGeo ? '<span class="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">国名・地名除外</span>' : ''}
               </div>
               <p class="text-xs text-slate-500 mt-1 truncate">${escapeHtml((item.route || []).join(' → '))}</p>
             </div>
@@ -2931,12 +3041,11 @@
         }
       });
 
-      el.excludeTokyoBtn.addEventListener('click', () => {
-        state.excludeTokyo = !state.excludeTokyo;
-        updateExcludeTokyoButtonUI();
-        showToast(state.excludeTokyo ? '「東京都」を除外：ON' : '「東京都」を除外：OFF');
+      el.excludeGeoBtn.addEventListener('click', () => {
+        state.excludeGeo = !state.excludeGeo;
+        updateExcludeGeoButtonUI();
+        showToast(state.excludeGeo ? '国名・地名を除外：ON' : '国名・地名を除外：OFF');
 
-        // すでに結果が表示されていて検索中でなければ、新設定で自動再検索
         if (!state.isSearching && state.currentResult && state.currentResult.startTitle) {
           runSearch(state.currentResult.startTitle);
         }
@@ -2995,9 +3104,10 @@
           state.searchMode = item.mode;
           updateSearchModeUI();
         }
-        if (typeof item.excludeTokyo === 'boolean' && state.excludeTokyo !== item.excludeTokyo) {
-          state.excludeTokyo = item.excludeTokyo;
-          updateExcludeTokyoButtonUI();
+        const savedExcludeGeo = item.excludeGeo ?? item.excludeTokyo;
+        if (typeof savedExcludeGeo === 'boolean' && state.excludeGeo !== savedExcludeGeo) {
+          state.excludeGeo = savedExcludeGeo;
+          updateExcludeGeoButtonUI();
         }
         runSearch(item.startTitle);
       });
@@ -3029,7 +3139,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       initPresets();
       updateSearchModeUI();
-      updateExcludeTokyoButtonUI();
+      updateExcludeGeoButtonUI();
       loadHistory();
       bindEvents();
       initGoalCache();
