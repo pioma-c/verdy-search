@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>東京ヴェルディへの最短ルート検索</title>
-  <meta name="description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達する最短ルートをリアルタイム検索できるWebツールです。" />
+  <meta name="description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達するルートを検索できるWebツールです。片方向で1手ずつたどる「連想モード」と「最短ルート検索」に対応。" />
 
   <!-- =========================================================================
        OGP・X（旧Twitter）カード設定
@@ -13,13 +13,13 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="東京ヴェルディへの最短ルート検索" />
   <meta property="og:title" content="東京ヴェルディへの最短ルート検索" />
-  <meta property="og:description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達する最短ルートを検索！" />
+  <meta property="og:description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達するルートを検索！" />
   <meta property="og:url" content="https://example.com/" />
   <!-- OGP画像を用意した場合はURLを設定してください（推奨: 1200x630px） -->
   <!-- <meta property="og:image" content="https://example.com/ogp.png" /> -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="東京ヴェルディへの最短ルート検索" />
-  <meta name="twitter:description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達する最短ルートを検索！" />
+  <meta name="twitter:description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達するルートを検索！" />
   <!-- <meta name="twitter:image" content="https://example.com/ogp.png" /> -->
 
   <!-- Tailwind CSS -->
@@ -40,6 +40,7 @@
               700: '#005230',
               800: '#054229',
               900: '#063623',
+              950: '#032216',
             },
             gold: {
               400: '#d4b370',
@@ -107,7 +108,7 @@
         東京ヴェルディへの最短ルート検索
       </h1>
       <p class="mt-2 text-sm sm:text-base text-verdy-100 leading-relaxed">
-        好きな言葉を入力すると、Wikipediaの本文リンクをたどって<strong class="text-white font-bold underline decoration-gold-400 decoration-2 underline-offset-4">東京ヴェルディ</strong>へ到達する最短ルートをリアルタイム検索します。
+        好きな言葉からWikipediaの本文リンクをたどり、<strong class="text-white font-bold underline decoration-gold-400 decoration-2 underline-offset-4">東京ヴェルディ</strong>を目指します。片方向で1手ずつ連想する「連想モード」と「最短ルート検索」を切り替えられます。
       </p>
     </div>
   </header>
@@ -118,6 +119,37 @@
     <!-- 検索フォームカード -->
     <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-6">
       <form id="searchForm" class="space-y-4" autocomplete="off">
+
+        <!-- 検索モード切り替えタブ（デフォルト：連想モード） -->
+        <div>
+          <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/70" role="tablist" aria-label="検索モード切り替え">
+            <button
+              type="button"
+              id="modeAssociationBtn"
+              role="tab"
+              aria-selected="true"
+              class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer bg-verdy-600 text-white shadow-sm"
+            >
+              <span>連想モード</span>
+              <span id="modeAssociationSub" class="text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded bg-white/20 text-verdy-50">片方向・1手ずつ</span>
+            </button>
+            <button
+              type="button"
+              id="modeShortestBtn"
+              role="tab"
+              aria-selected="false"
+              class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer text-slate-600 hover:text-slate-800 hover:bg-white/60"
+            >
+              <span>最短ルート検索</span>
+              <span id="modeShortestSub" class="text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-500">最短クリック</span>
+            </button>
+          </div>
+          <p id="modeDescription" class="mt-2 text-xs text-slate-500 leading-relaxed">
+            出発記事の本文リンクを片方向で1手ずつ連想ゲームのようにたどり、東京ヴェルディを目指します（寄り道あり・毎回変化）。
+          </p>
+        </div>
+
+        <!-- キーワード入力欄 -->
         <div>
           <label for="startInput" class="block text-sm font-bold text-slate-700 mb-2">
             出発するWikipedia記事（キーワード）
@@ -135,7 +167,7 @@
               <button
                 type="button"
                 id="clearInputBtn"
-                class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 rounded-lg transition"
+                class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 rounded-lg transition cursor-pointer"
                 aria-label="入力をクリア"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -159,7 +191,7 @@
               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" />
               </svg>
-              <span>ルートを検索</span>
+              <span id="searchBtnLabel">連想をスタート</span>
             </button>
           </div>
         </div>
@@ -172,10 +204,10 @@
             id="excludeTokyoBtn"
             role="switch"
             aria-checked="true"
-            class="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition cursor-pointer select-none"
+            class="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition cursor-pointer select-none bg-verdy-50 border-verdy-300 text-verdy-800"
           >
             <span id="excludeTokyoTrack" class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-verdy-600">
-              <span id="excludeTokyoKnob" class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform translate-x-4.5"></span>
+              <span id="excludeTokyoKnob" style="transform: translateX(18px);" class="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"></span>
             </span>
             <span>「東京都」を除外</span>
           </button>
@@ -239,6 +271,15 @@
         </button>
       </div>
 
+      <!-- 連想モード用：リアルタイム連想チェーン表示 -->
+      <div id="liveChainWrap" class="hidden mt-4 pt-3.5 border-t border-slate-100">
+        <div class="text-[11px] font-bold text-verdy-700 mb-2 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-verdy-500 animate-ping"></span>
+          <span>現在の連想ルート（リアルタイム）：</span>
+        </div>
+        <div id="liveChainNodes" class="flex flex-wrap items-center gap-1.5"></div>
+      </div>
+
       <div class="grid grid-cols-2 gap-2.5 mt-4 pt-3.5 border-t border-slate-100 text-xs">
         <div class="bg-slate-50 rounded-xl px-3 py-2 flex items-center justify-between">
           <span class="text-slate-500">API通信回数</span>
@@ -273,8 +314,11 @@
             </svg>
             <span id="resultClicksBadge">0クリックで到達！</span>
           </span>
+          <span id="resultModeBadge" class="inline-flex items-center gap-1 bg-white/20 border border-white/25 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+            連想モード
+          </span>
           <span id="resultExcludeBadge" class="hidden inline-flex items-center gap-1 bg-white/15 border border-white/25 text-verdy-50 text-xs font-semibold px-2.5 py-1 rounded-full">
-            「東京都」除外モード
+            「東京都」除外
           </span>
           <span class="inline-flex items-center gap-1 bg-black/20 text-verdy-100 text-xs font-medium px-2.5 py-1 rounded-full">
             本文リンク限定
@@ -285,7 +329,7 @@
         <p id="resultSubnote" class="hidden text-xs sm:text-sm text-verdy-100/90 mt-1.5"></p>
         <p id="resultPathSummary" class="mt-3 text-sm font-semibold text-verdy-50 bg-black/15 rounded-xl px-3.5 py-2.5 leading-relaxed break-words"></p>
 
-        <!-- アクションボタン（白色コピーボタン & 黒色Xシェアボタン） -->
+        <!-- アクションボタン（白色コピーボタン & 黒色Xシェアボタン & 連想モード再試行ボタン） -->
         <div class="mt-4 flex flex-wrap items-center gap-2.5">
           <button
             type="button"
@@ -309,10 +353,21 @@
             </svg>
             <span>結果をX(旧Twitter)にシェアする</span>
           </button>
+
+          <button
+            type="button"
+            id="retryAssociationBtn"
+            class="hidden inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-verdy-900/50 hover:bg-verdy-900/75 border border-white/25 text-white font-bold text-sm transition cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>別の連想を試す</span>
+          </button>
         </div>
       </div>
 
-      <!-- 別ルート切り替えタブ（複数候補がある場合） -->
+      <!-- 別ルート切り替えタブ（最短ルート検索で複数候補がある場合） -->
       <div id="altRoutesBar" class="hidden bg-white rounded-2xl border border-slate-200/80 p-3.5 flex flex-wrap items-center gap-2">
         <span class="text-xs font-bold text-slate-500 mr-1">同じクリック数の別ルート：</span>
         <div id="altRoutesButtons" class="flex flex-wrap gap-2"></div>
@@ -358,16 +413,20 @@
         </summary>
         <div class="px-4 sm:px-6 pb-5 pt-1 text-xs sm:text-sm text-slate-600 space-y-2.5 leading-relaxed border-t border-slate-100">
           <p>
-            <strong>1. 双方向リアルタイム検索：</strong>
-            起動時に「東京ヴェルディ1969」への被リンクと主要ハブ記事をキャッシュし、入力された出発記事からの発リンクと両側から照合することで、最大4クリック以内の最短ルートをブラウザ上だけで検索します。
+            <strong>1. 連想モード（デフォルト・片方向）：</strong>
+            出発記事の冒頭〜本文前半にある特徴的なリンクから片方向で1手ずつたどり、連想ゲームのように寄り道しながら東京ヴェルディへ着地します。「別の連想を試す」で同じ単語から毎回違うルートを楽しめます。
           </p>
           <p>
-            <strong>2. 本文リンク限定（脚注・折りたたみ一覧表を常時除外）：</strong>
+            <strong>2. 最短ルート検索（双方向リアルタイム検索）：</strong>
+            起動時に「東京ヴェルディ1969」への被リンクと主要ハブ記事をキャッシュし、出発記事からの発リンクと両側から照合することで、最大4クリック以内の最短ルートを検索します。
+          </p>
+          <p>
+            <strong>3. 本文リンク限定（脚注・折りたたみ一覧表を常時除外）：</strong>
             WikipediaのHTML構造を解析し、「脚注」「注釈」「出典」「参考文献」セクションや、記事下部の折りたたみ一覧表（ナビゲーションボックス／テンプレート）に含まれるリンクはすべて除外した上で、本文中のリンクだけでつながる経路を検証しています。
           </p>
           <p>
-            <strong>3. 「「東京都」を除外」モード：</strong>
-            デフォルトでONになっており、中継地点として「東京都」を経由しない、より意外性のあるルートを検索します。オフにすると「東京都」経由も含めた最短ルートを検索できます。
+            <strong>4. 「「東京都」を除外」設定：</strong>
+            デフォルトでONになっており、中継地点として「東京都」を経由しない、より意外性のあるルートを検索します。オフにすると「東京都」経由も含めて検索できます。
           </p>
         </div>
       </details>
@@ -401,7 +460,7 @@
 
     const WIKI_API = 'https://ja.wikipedia.org/w/api.php';
     const GOAL_QUERY_TITLE = '東京ヴェルディ1969';
-    const HISTORY_STORAGE_KEY = 'tokyo_verdy_wiki_route_history_v2';
+    const HISTORY_STORAGE_KEY = 'tokyo_verdy_wiki_route_history_v3';
 
     const PRESET_KEYWORDS = [
       'ラーメン',
@@ -417,6 +476,14 @@
     // 「「東京都」を除外」ON時に中継から除外するタイトル
     const EXCLUDED_TOKYO_TITLES = new Set(['東京都', '東京']);
 
+    // 連想モードの序盤（1〜2手目）で即ワープを避けたい超一般語（連想ゲーム感を高めるため）
+    const GENERIC_EARLY_HUBS = new Set([
+      '日本', '世界', '地球', '人間', '歴史', '社会', '文化', '言語', '英語', '日本語',
+      'アメリカ合衆国', 'ヨーロッパ', 'アジア', '中国', '中華人民共和国', '東京都', '東京',
+      '20世紀', '21世紀', '19世紀', '平成', '昭和', '令和', '明治', '大正',
+      'テレビ', '映画', '音楽', 'スポーツ', '科学', '経済', '政治', '日本テレビ放送網', '読売新聞'
+    ]);
+
     // 日本語版Wikipediaの主要ハブ記事候補（ゴールへの直接リンク有無を起動時にAPI検証する・50件以内）
     const SUPER_HUB_CANDIDATES = [
       '東京都', '日本プロサッカーリーグ', 'Jリーグ', 'サッカー', '日本テレビ放送網',
@@ -429,7 +496,7 @@
       '三浦知良', 'ラモス瑠偉', '北澤豪', '読売新聞グループ本社', '日テレ・東京ヴェルディベレーザ'
     ];
 
-    // 3〜4クリック検索で優先的に展開したい中継ハブ記事
+    // 3〜4クリック検索および連想モードの収束時に優先したい中継ハブ記事
     const PRIORITY_BRIDGE_HUBS = new Set([
       '日本', 'スポーツ', 'サッカー', '日本テレビ放送網', '読売新聞', '読売新聞社',
       'テレビ', '映画', 'アニメ', '音楽', '関東地方', '神奈川県', '川崎市', '調布市',
@@ -448,15 +515,17 @@
     // アプリ状態管理
     // =========================================================================
     const state = {
+      searchMode: 'association',         // 'association'（連想モード・デフォルト） | 'shortest'（最短ルート検索）
       canonicalGoal: GOAL_QUERY_TITLE,
       goalAliases: new Set(['東京ヴェルディ1969', '東京ヴェルディ', 'ヴェルディ川崎', '読売サッカークラブ']),
       goalBacklinks: new Set(),          // 1クリックでゴールへ到達できる候補記事群
       verifiedDirectHubs: new Set(),     // 主要ハブのうちゴールへリンクしている記事
       outgoingLinksCache: new Map(),     // articleTitle -> string[]（発リンク取得結果キャッシュ）
-      cleanLinksCache: new Map(),        // articleTitle -> Set<string>（脚注・一覧表除外済みの本文リンク）
+      cleanLinksCache: new Map(),        // articleTitle -> Set<string>（脚注・一覧表除外済みの本文リンク・出現順保持）
       verifiedGoalSources: new Set(),    // 本文リンクから直接ゴールへ到達できると検証済みの記事
       rejectedGoalSources: new Set(),    // ゴールへのリンクが脚注・一覧表のみと判明した記事
       articleInfoCache: new Map(),       // articleTitle -> { title, extract, thumbnail, url }
+      usedAssociationFirstHops: new Map(), // startTitle -> Set<string>（「別の連想を試す」で重複分岐を避ける）
       cacheReady: false,
       cachePromise: null,
       isSearching: false,
@@ -466,7 +535,7 @@
       elapsedTimer: null,
       apiCalls: 0,
       scannedCount: 0,
-      currentResult: null,               // { startTitle, note, excludeTokyo, routes: string[][], selectedIndex: number }
+      currentResult: null,               // { mode, startTitle, note, excludeTokyo, routes: string[][], selectedIndex: number }
       history: [],
       suggestTimer: null,
       suggestActiveIndex: -1,
@@ -483,10 +552,16 @@
       cacheStatusDot: document.getElementById('cacheStatusDot'),
       cacheStatusText: document.getElementById('cacheStatusText'),
       searchForm: document.getElementById('searchForm'),
+      modeAssociationBtn: document.getElementById('modeAssociationBtn'),
+      modeAssociationSub: document.getElementById('modeAssociationSub'),
+      modeShortestBtn: document.getElementById('modeShortestBtn'),
+      modeShortestSub: document.getElementById('modeShortestSub'),
+      modeDescription: document.getElementById('modeDescription'),
       startInput: document.getElementById('startInput'),
       clearInputBtn: document.getElementById('clearInputBtn'),
       suggestList: document.getElementById('suggestList'),
       searchBtn: document.getElementById('searchBtn'),
+      searchBtnLabel: document.getElementById('searchBtnLabel'),
       excludeTokyoBtn: document.getElementById('excludeTokyoBtn'),
       excludeTokyoTrack: document.getElementById('excludeTokyoTrack'),
       excludeTokyoKnob: document.getElementById('excludeTokyoKnob'),
@@ -496,6 +571,8 @@
       progressPhase: document.getElementById('progressPhase'),
       progressElapsed: document.getElementById('progressElapsed'),
       progressText: document.getElementById('progressText'),
+      liveChainWrap: document.getElementById('liveChainWrap'),
+      liveChainNodes: document.getElementById('liveChainNodes'),
       metricApiCalls: document.getElementById('metricApiCalls'),
       metricScanned: document.getElementById('metricScanned'),
       cancelBtn: document.getElementById('cancelBtn'),
@@ -505,6 +582,7 @@
       messageBody: document.getElementById('messageBody'),
       resultSection: document.getElementById('resultSection'),
       resultClicksBadge: document.getElementById('resultClicksBadge'),
+      resultModeBadge: document.getElementById('resultModeBadge'),
       resultExcludeBadge: document.getElementById('resultExcludeBadge'),
       resultHeadline: document.getElementById('resultHeadline'),
       resultSubnote: document.getElementById('resultSubnote'),
@@ -512,6 +590,7 @@
       copyResultBtn: document.getElementById('copyResultBtn'),
       copyResultBtnLabel: document.getElementById('copyResultBtnLabel'),
       shareXBtn: document.getElementById('shareXBtn'),
+      retryAssociationBtn: document.getElementById('retryAssociationBtn'),
       altRoutesBar: document.getElementById('altRoutesBar'),
       altRoutesButtons: document.getElementById('altRoutesButtons'),
       routeCardsContainer: document.getElementById('routeCardsContainer'),
@@ -549,11 +628,25 @@
     }
 
     function isDateOrListTitle(title) {
-      return /^(\d+年|\d+月\d+日|\d+年代|一覧|Category:)/.test(title) || /の一覧$/.test(title);
+      return /^(\d+年|\d+月\d+日|\d+年代|一覧|Category:|\d+世紀)/.test(title) || /の一覧$/.test(title);
     }
 
     function wikiArticleUrl(title) {
       return `https://ja.wikipedia.org/wiki/${encodeURIComponent(String(title).replace(/ /g, '_'))}`;
+    }
+
+    function pickWeightedRandom(items, topLimit = 6) {
+      if (!items || items.length === 0) return null;
+      const pool = items.slice(0, Math.min(topLimit, items.length));
+      // 先頭ほど選ばれやすい重み付き抽選
+      const weights = pool.map((_, idx) => Math.max(1, pool.length - idx));
+      const total = weights.reduce((a, b) => a + b, 0);
+      let r = Math.random() * total;
+      for (let i = 0; i < pool.length; i++) {
+        r -= weights[i];
+        if (r <= 0) return pool[i];
+      }
+      return pool[0];
     }
 
     /**
@@ -648,11 +741,12 @@
     // Wikipedia API 通信 & 本文リンク抽出エンジン（脚注・折りたたみ一覧表を常時除外）
     // =========================================================================
 
-    // グローバルAPIレート制御（HTTP 429回避のため同時実行数と送信間隔を制御）
+    // グローバルAPIレート制御（HTTP 429回避のため直列実行＆動的な送信間隔制御）
     const apiLimiter = {
       active: 0,
-      maxConcurrent: 2,
-      minIntervalMs: 220,
+      maxConcurrent: 1,
+      baseMinIntervalMs: 300,
+      minIntervalMs: 300,
       lastRequestTime: 0,
       queue: []
     };
@@ -774,9 +868,11 @@
             const retryAfterSec = parseInt(res.headers.get('Retry-After') || '', 10);
             const baseDelay = Number.isFinite(retryAfterSec) && retryAfterSec > 0
               ? retryAfterSec * 1000
-              : 1500 * Math.pow(2, attempt) + Math.floor(Math.random() * 400);
-            const delayMs = Math.min(baseDelay, 8000);
+              : 2000 * Math.pow(2, attempt) + Math.floor(Math.random() * 500);
+            const delayMs = Math.min(baseDelay, 10000);
 
+            // レート制限を検知したら以降の送信間隔も自動で緩める
+            apiLimiter.minIntervalMs = Math.min(1200, Math.max(apiLimiter.minIntervalMs * 1.5, 600));
             apiLimiter.lastRequestTime = Math.max(apiLimiter.lastRequestTime, Date.now() + delayMs);
 
             if (state.isSearching) {
@@ -802,6 +898,12 @@
         if (data && data.error) {
           throw new Error(data.error.info || 'Wikipedia APIエラー');
         }
+
+        // 正常応答が続けば送信間隔を徐々に基準値へ戻す
+        if (apiLimiter.minIntervalMs > apiLimiter.baseMinIntervalMs) {
+          apiLimiter.minIntervalMs = Math.max(apiLimiter.baseMinIntervalMs, Math.floor(apiLimiter.minIntervalMs * 0.85));
+        }
+
         return data;
       }
 
@@ -811,29 +913,114 @@
     }
 
     /**
-     * 記事HTMLから脚注・出典セクションおよび記事下部の折りたたみ一覧表（ナビゲーションボックス／テンプレート）を
-     * すべて除去し、本文中の標準名前空間リンクのみを抽出する
+     * Wikitext内の指定パターンのテンプレート（脚注・出典・ナビゲーション等）をネスト対応で除去
      */
-    function extractCleanBodyLinksFromHtml(htmlString, selfTitle) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlString || '', 'text/html');
-      const root = doc.querySelector('.mw-parser-output') || doc.body;
-      if (!root) return new Set();
+    function stripTemplatesByPattern(wikitext, nameRegex) {
+      let out = '';
+      let i = 0;
+      const len = wikitext.length;
 
-      // 1. 「脚注」「注釈」「出典」「参考文献」などの見出し配下のセクションを丸ごと除去
-      const children = Array.from(root.children);
+      while (i < len) {
+        if (wikitext[i] === '{' && wikitext[i + 1] === '{') {
+          let depth = 1;
+          let j = i + 2;
+          while (j < len && depth > 0) {
+            if (wikitext[j] === '{' && wikitext[j + 1] === '{') {
+              depth += 1;
+              j += 2;
+            } else if (wikitext[j] === '}' && wikitext[j + 1] === '}') {
+              depth -= 1;
+              j += 2;
+            } else {
+              j += 1;
+            }
+          }
+          const inner = wikitext.slice(i + 2, depth === 0 ? j - 2 : j);
+          const tplName = inner.split(/[|\n]/)[0].trim();
+          if (nameRegex.test(tplName)) {
+            i = j;
+            continue;
+          }
+          // 対象外テンプレート（基礎情報など）は中身を残しつつ内部の不要テンプレートも再帰的に除去
+          out += '{{' + stripTemplatesByPattern(inner, nameRegex) + (depth === 0 ? '}}' : '');
+          i = j;
+        } else {
+          out += wikitext[i];
+          i += 1;
+        }
+      }
+      return out;
+    }
+
+    /**
+     * Wikitext内のInfobox以外の折りたたみテーブル（mw-collapsible / collapsible）を除去
+     */
+    function stripCollapsibleTables(wikitext) {
+      let out = '';
+      let i = 0;
+      const len = wikitext.length;
+
+      while (i < len) {
+        if (wikitext[i] === '{' && wikitext[i + 1] === '|') {
+          let depth = 1;
+          let j = i + 2;
+          while (j < len && depth > 0) {
+            if (wikitext[j] === '{' && wikitext[j + 1] === '|') {
+              depth += 1;
+              j += 2;
+            } else if (wikitext[j] === '|' && wikitext[j + 1] === '}') {
+              depth -= 1;
+              j += 2;
+            } else {
+              j += 1;
+            }
+          }
+          const block = wikitext.slice(i, j);
+          const firstLine = block.split('\n')[0] || '';
+          const isCollapsible = /\b(mw-collapsible|collapsible)\b/i.test(firstLine);
+          const isInfobox = /\binfobox\b/i.test(firstLine);
+          if (isCollapsible && !isInfobox) {
+            i = j;
+            continue;
+          }
+          out += block;
+          i = j;
+        } else {
+          out += wikitext[i];
+          i += 1;
+        }
+      }
+      return out;
+    }
+
+    /**
+     * Wikitextから脚注（<ref>および脚注・出典セクション）と折りたたみ一覧表・テンプレートを除外し、
+     * 本文中の標準名前空間リンクのみを出現順に抽出する
+     * ※Wikitextでは記事下部のナビゲーションボックステンプレート（{{...}}）が展開されないため自動で除外される
+     */
+    function extractCleanBodyLinksFromWikitext(wikitext, selfTitle) {
+      if (!wikitext) return new Set();
+
+      let text = String(wikitext);
+
+      // 1. HTMLコメント・nowiki/math/コードブロック・インライン脚注（<ref>）を除去
+      text = text.replace(/<!--[\s\S]*?-->/g, '');
+      text = text.replace(/<(nowiki|math|syntaxhighlight|source|timeline)\b[^>]*>[\s\S]*?<\/\1>/gi, '');
+      text = text.replace(/<ref\b[^>]*>[\s\S]*?<\/ref>/gi, '');
+      text = text.replace(/<ref\b[^>]*\/\s*>/gi, '');
+
+      // 2. 「脚注」「注釈」「出典」「参考文献」などの見出し配下セクションを丸ごと除去
+      const lines = text.split('\n');
+      const keptLines = [];
       let removingDepth = 0;
-      for (const child of children) {
-        const headingEl = child.matches('h1, h2, h3, h4, h5, h6')
-          ? child
-          : child.classList.contains('mw-heading')
-            ? child.querySelector('h1, h2, h3, h4, h5, h6')
-            : null;
 
-        if (headingEl) {
-          const level = parseInt(headingEl.tagName.slice(1), 10) || 2;
-          const headlineText = (headingEl.querySelector('.mw-headline')?.textContent || headingEl.textContent || '')
-            .replace(/\[編集\]/g, '')
+      for (const line of lines) {
+        const headingMatch = line.match(/^(={2,6})\s*(.+?)\s*\1\s*$/);
+        if (headingMatch) {
+          const level = headingMatch[1].length;
+          const headlineText = headingMatch[2]
+            .replace(/'''?/g, '')
+            .replace(/<[^>]+>/g, '')
             .trim();
 
           if (removingDepth > 0 && level <= removingDepth) {
@@ -841,126 +1028,229 @@
           }
           if (EXCLUDED_SECTION_HEADINGS.has(headlineText)) {
             removingDepth = level;
-            child.remove();
             continue;
           }
         }
-
-        if (removingDepth > 0) {
-          child.remove();
+        if (removingDepth === 0) {
+          keptLines.push(line);
         }
       }
+      text = keptLines.join('\n');
 
-      // 2. 脚注ブロック、ナビゲーションボックス、記事下部の折りたたみ一覧表・テンプレート類を除去
-      const removeSelectors = [
-        '.reflist',
-        '.references',
-        'ol.references',
-        '.mw-references-wrap',
-        'sup.reference',
-        '.reference',
-        '.navbox',
-        '.navbox-inner',
-        '.navbox-subgroup',
-        '.NavFrame',
-        '[role="navigation"]',
-        '.sistersitebox',
-        '.authority-control',
-        '.asbox',
-        '.stub',
-        '.portal',
-        '.catlinks',
-        '.printfooter',
-        '.mw-editsection',
-        '.ambox',
-        '.ombox',
-        '.tmbox',
-        '.cmbox',
-        '.noprint',
-        '.metadata'
-      ];
-      for (const sel of removeSelectors) {
-        root.querySelectorAll(sel).forEach((node) => node.remove());
-      }
+      // 3. 折りたたみブロック（Collapse top / Hidden begin 等）および脚注・ナビ系テンプレートを除去
+      text = text.replace(
+        /\{\{\s*(?:Collapse top|Collapsed top|Hidden begin|Refbegin)\b[\s\S]*?\{\{\s*(?:Collapse bottom|Collapsed bottom|Hidden end|Refend)\s*\}\}/gi,
+        ''
+      );
+      text = stripTemplatesByPattern(
+        text,
+        /^(?:cite\b|citation\b|sfn|harv|efn|refn|reflist|notelist|navbox|hidden|authority\s*control|normdaten|portal|sister|commonscat|wikisource|wikiquote|wiktionary|wikibooks|wikinews|stub$|.*-stub$|脚注ヘルプ)/i
+      );
 
-      // 3. Infobox以外の折りたたみ一覧表（.mw-collapsible / .collapsible）を除去
-      root.querySelectorAll('.mw-collapsible, .collapsible').forEach((node) => {
-        if (!node.closest('.infobox')) {
-          node.remove();
-        }
-      });
+      // 4. Infobox以外の折りたたみテーブルを除去
+      text = stripCollapsibleTables(text);
 
-      // 4. 残った本文領域から標準名前空間の内部リンクを抽出
+      // 5. 本文に残った内部リンク [[リンク先|表示名]] を出現順に抽出
       const links = new Set();
       const selfNorm = normalizeTitle(selfTitle);
+      const linkRegex = /\[\[([^\[\]\n]+)\]\]/g;
+      let match;
 
-      root.querySelectorAll('a[href]').forEach((a) => {
-        if (a.classList.contains('new') || a.classList.contains('external') || a.classList.contains('extiw')) {
-          return;
-        }
-        const href = a.getAttribute('href') || '';
-        if (!href.startsWith('/wiki/')) return;
-
-        let rawTitle = href.slice('/wiki/'.length).split('#')[0].split('?')[0];
-        if (!rawTitle) return;
+      while ((match = linkRegex.exec(text)) !== null) {
+        let target = match[1].split('|')[0].split('#')[0].trim();
+        if (!target) continue;
+        if (target.startsWith(':')) target = target.slice(1).trim();
 
         try {
-          rawTitle = decodeURIComponent(rawTitle);
+          if (target.includes('%')) target = decodeURIComponent(target);
         } catch {
-          return;
+          // デコード失敗時はそのまま使用
         }
 
-        const title = normalizeTitle(rawTitle);
-        if (!title || title === selfNorm) return;
+        let title = normalizeTitle(target);
+        if (!title) continue;
 
-        // 名前空間プレフィックス（Wikipedia:, Category:, Template:, File:, Portal:, Help:, Special:, 特別: など）を除外
-        if (/^(Wikipedia|Category|Template|File|Image|Portal|Help|Special|Module|MediaWiki|User|Talk|プロジェクト|カテゴリ|テンプレート|ファイル|画像|ポータル|ヘルプ|特別|モジュール|利用者|ノート|議論):/i.test(title)) {
-          return;
+        // 名前空間プレフィックスおよび他言語版リンク（小文字の en: 等）を除外
+        if (
+          /^(Wikipedia|WP|Category|Template|File|Image|Portal|Help|Special|Module|MediaWiki|User|Talk|Draft|Book|TimedText|プロジェクト|カテゴリ|テンプレート|ファイル|画像|ポータル|ヘルプ|特別|モジュール|利用者|ノート|議論|wikt|wiktionary|wikisource|wikiquote|wikibooks|wikinews|wikiversity|wikivoyage|commons|meta|species):/i.test(title) ||
+          /^[a-z]{2,3}(?:-[a-z0-9]+)?:/.test(title)
+        ) {
+          continue;
         }
 
+        // MediaWiki仕様に合わせて先頭のASCII小文字を大文字化
+        if (/^[a-z]/.test(title)) {
+          title = title[0].toUpperCase() + title.slice(1);
+        }
+
+        if (title === selfNorm) continue;
         links.add(title);
-      });
+      }
 
       return links;
     }
 
     /**
-     * 指定記事の「本文リンク（脚注・折りたたみ一覧表を除外）」を取得（キャッシュ付き）
+     * 複数記事の「本文リンク（脚注・折りたたみ一覧表を除外）」をWikitext一括取得（action=query）で高速取得
+     * ※action=parse を使わず5記事ずつまとめて取得することで HTTP 429 を大幅に回避する
+     */
+    async function batchGetCleanBodyLinks(titles, signal) {
+      const resultMap = new Map();
+      if (!titles || titles.length === 0) return resultMap;
+
+      const uncached = [];
+      const seenUncached = new Set();
+
+      for (const raw of titles) {
+        const key = normalizeTitle(raw);
+        if (!key) continue;
+        if (state.cleanLinksCache.has(key)) {
+          resultMap.set(key, state.cleanLinksCache.get(key));
+        } else if (!seenUncached.has(key)) {
+          seenUncached.add(key);
+          uncached.push(key);
+        }
+      }
+
+      const fetchChunk = async (chunk) => {
+        if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+        const chunkSet = new Set(chunk);
+
+        const data = await wikiFetch(
+          {
+            action: 'query',
+            titles: chunk.join('|'),
+            prop: 'revisions',
+            rvprop: 'content',
+            rvslots: 'main',
+            redirects: '1'
+          },
+          signal
+        );
+
+        const reverseMap = new Map();
+        for (const n of data?.query?.normalized || []) {
+          const toKey = normalizeTitle(n.to);
+          const fromKey = normalizeTitle(n.from);
+          if (!reverseMap.has(toKey)) reverseMap.set(toKey, []);
+          reverseMap.get(toKey).push(fromKey);
+        }
+        for (const r of data?.query?.redirects || []) {
+          const fromKey = normalizeTitle(r.from);
+          const toKey = normalizeTitle(r.to);
+          const origs = reverseMap.get(fromKey) || [fromKey];
+          if (!reverseMap.has(toKey)) reverseMap.set(toKey, []);
+          reverseMap.get(toKey).push(...origs);
+        }
+
+        for (const page of data?.query?.pages || []) {
+          const pageTitle = normalizeTitle(page.title);
+          const rev = page.revisions?.[0];
+          const hasContent = Boolean(rev && (rev.slots?.main?.content !== undefined || rev.content !== undefined));
+
+          // レスポンスサイズ上限等でrevisionsが返らなかった記事は後続の個別フォールバックへ回す
+          if (!page.missing && !page.invalid && !hasContent) {
+            continue;
+          }
+
+          const wikitext = rev?.slots?.main?.content ?? rev?.content ?? '';
+          const cleanSet = (page.missing || page.invalid)
+            ? new Set()
+            : extractCleanBodyLinksFromWikitext(wikitext, pageTitle);
+
+          const keys = new Set(reverseMap.get(pageTitle) || []);
+          if (chunkSet.has(pageTitle) || keys.size === 0) {
+            keys.add(pageTitle);
+          }
+
+          state.cleanLinksCache.set(pageTitle, cleanSet);
+          for (const k of keys) {
+            state.cleanLinksCache.set(k, cleanSet);
+            resultMap.set(k, cleanSet);
+          }
+
+          state.scannedCount += cleanSet.size;
+        }
+        el.metricScanned.textContent = `${state.scannedCount.toLocaleString()}件`;
+      };
+
+      // 5記事ずつ一括取得（action=query のため非常に軽量）
+      const chunkSize = 5;
+      for (let i = 0; i < uncached.length; i += chunkSize) {
+        const chunk = uncached.slice(i, i + chunkSize);
+        await fetchChunk(chunk);
+
+        // 長大な記事などで一括取得から漏れたタイトルがあれば個別補完
+        for (const key of chunk) {
+          if (!state.cleanLinksCache.has(key)) {
+            await fetchChunk([key]);
+            if (!state.cleanLinksCache.has(key)) {
+              const empty = new Set();
+              state.cleanLinksCache.set(key, empty);
+              resultMap.set(key, empty);
+            }
+          }
+        }
+      }
+
+      return resultMap;
+    }
+
+    /**
+     * 指定記事の「本文リンク（脚注・折りたたみ一覧表を除外）」を取得（キャッシュ付き・出現順保持）
      */
     async function getCleanBodyLinks(title, signal) {
       const key = normalizeTitle(title);
       if (state.cleanLinksCache.has(key)) {
         return state.cleanLinksCache.get(key);
       }
-
-      const data = await wikiFetch(
-        {
-          action: 'parse',
-          page: key,
-          prop: 'text',
-          redirects: '1',
-          disableeditsection: '1',
-          disabletoc: '1'
-        },
-        signal
-      );
-
-      const html = data?.parse?.text || '';
-      const resolvedTitle = normalizeTitle(data?.parse?.title || key);
-      const cleanSet = extractCleanBodyLinksFromHtml(html, resolvedTitle);
-
-      state.cleanLinksCache.set(key, cleanSet);
-      if (resolvedTitle && resolvedTitle !== key) {
-        state.cleanLinksCache.set(resolvedTitle, cleanSet);
-      }
-
-      state.scannedCount += cleanSet.size;
-      el.metricScanned.textContent = `${state.scannedCount.toLocaleString()}件`;
-      return cleanSet;
+      const map = await batchGetCleanBodyLinks([key], signal);
+      return map.get(key) || new Set();
     }
 
     /**
-     * 指定記事が「本文リンク」から直接ゴール記事へリンクしているかをHTML裏取り検証
+     * 複数候補記事が「本文リンク」から直接ゴール記事へリンクしているかを一括裏取り検証
+     */
+    async function batchVerifyCleanLinksToGoal(titles, signal) {
+      const toFetch = [];
+      for (const t of titles) {
+        const key = normalizeTitle(t);
+        if (!state.verifiedGoalSources.has(key) && !state.rejectedGoalSources.has(key)) {
+          toFetch.push(key);
+        }
+      }
+
+      if (toFetch.length > 0) {
+        const cleanMap = await batchGetCleanBodyLinks(toFetch, signal);
+        for (const key of toFetch) {
+          const cleanLinks = cleanMap.get(key) || new Set();
+          let ok = false;
+          for (const alias of state.goalAliases) {
+            if (cleanLinks.has(alias)) {
+              ok = true;
+              break;
+            }
+          }
+          if (ok) {
+            state.verifiedGoalSources.add(key);
+          } else {
+            state.rejectedGoalSources.add(key);
+          }
+        }
+      }
+
+      const verified = [];
+      for (const t of titles) {
+        const key = normalizeTitle(t);
+        if (state.verifiedGoalSources.has(key)) {
+          verified.push(t);
+        }
+      }
+      return verified;
+    }
+
+    /**
+     * 指定記事が「本文リンク」から直接ゴール記事へリンクしているかを裏取り検証
      */
     async function verifyCleanLinkToGoal(title, signal) {
       const key = normalizeTitle(title);
@@ -968,15 +1258,8 @@
       if (state.rejectedGoalSources.has(key)) return false;
 
       try {
-        const cleanLinks = await getCleanBodyLinks(key, signal);
-        for (const alias of state.goalAliases) {
-          if (cleanLinks.has(alias)) {
-            state.verifiedGoalSources.add(key);
-            return true;
-          }
-        }
-        state.rejectedGoalSources.add(key);
-        return false;
+        const okList = await batchVerifyCleanLinksToGoal([key], signal);
+        return okList.length > 0;
       } catch (err) {
         if (err.name === 'AbortError' || err.isRateLimit) throw err;
         return false;
@@ -1283,7 +1566,7 @@
     }
 
     /**
-     * 中継候補の優先度ソート（ハブ記事を優先し、日付・一覧記事は後回し）
+     * 中継候補の優先度ソート（最短ルート検索用）
      */
     function prioritizeCandidates(titles, excludeTokyo) {
       const filtered = titles.filter((t) => !isExcludedIntermediate(t, excludeTokyo));
@@ -1300,33 +1583,34 @@
     }
 
     /**
-     * 候補リストの中から「本文リンクでゴールに到達する記事」を並列数2で裏取り検証
+     * 候補リストの中から「本文リンクでゴールに到達する記事」を一括取得で裏取り検証
      */
-    async function filterVerifiedGoalSources(candidates, maxNeeded, signal) {
+    async function filterVerifiedGoalSources(candidates, maxNeeded, signal, preferSpecific = false) {
       const ordered = [...candidates].sort((a, b) => {
-        const score = (t) =>
-          (state.verifiedGoalSources.has(t) ? 10 : 0) +
-          (state.verifiedDirectHubs.has(t) ? 4 : 0) +
-          (isDateOrListTitle(t) ? -3 : 0);
+        const score = (t) => {
+          let s = 0;
+          if (preferSpecific) {
+            if (!GENERIC_EARLY_HUBS.has(t)) s += 8;
+            if (!state.verifiedDirectHubs.has(t)) s += 2;
+          } else {
+            if (state.verifiedGoalSources.has(t)) s += 10;
+            if (state.verifiedDirectHubs.has(t)) s += 4;
+          }
+          if (isDateOrListTitle(t)) s -= 4;
+          return s;
+        };
         return score(b) - score(a);
       });
 
       const verified = [];
-      const batchSize = 2;
+      const batchSize = 5;
       for (let i = 0; i < ordered.length && verified.length < maxNeeded; i += batchSize) {
         if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
         const batch = ordered.slice(i, i + batchSize);
-        const checks = await runWithConcurrency(
-          batch,
-          batchSize,
-          async (cand) => ({ title: cand, ok: await verifyCleanLinkToGoal(cand, signal) }),
-          signal
-        );
-        for (const item of checks) {
-          if (item.ok) {
-            verified.push(item.title);
-            if (verified.length >= maxNeeded) break;
-          }
+        const okTitles = await batchVerifyCleanLinksToGoal(batch, signal);
+        for (const title of okTitles) {
+          verified.push(title);
+          if (verified.length >= maxNeeded) break;
         }
       }
 
@@ -1334,7 +1618,7 @@
     }
 
     // =========================================================================
-    // メイン検索フロー（0〜4クリック・本文リンク限定）
+    // 進捗UI制御（リアルタイム連想チェーン含む）
     // =========================================================================
 
     function updateProgress(text, phase) {
@@ -1342,7 +1626,32 @@
       if (phase) el.progressPhase.textContent = phase;
     }
 
-    function startProgressUI() {
+    function renderLiveChain(chain, isCompleted = false) {
+      el.liveChainWrap.classList.remove('hidden');
+      const chips = chain.map((title, idx) => {
+        const isStart = idx === 0;
+        const isLast = idx === chain.length - 1;
+        let cls = 'bg-slate-100 text-slate-700 border-slate-200';
+        if (isStart) {
+          cls = 'bg-slate-800 text-white border-slate-800';
+        } else if (isLast && isCompleted) {
+          cls = 'bg-verdy-600 text-white border-verdy-600';
+        } else if (isLast) {
+          cls = 'bg-verdy-100 text-verdy-900 border-verdy-300';
+        }
+        const arrow = idx > 0
+          ? '<span class="text-slate-400 text-xs font-bold select-none">→</span>'
+          : '';
+        return `${arrow}<span class="inline-flex items-center px-2.5 py-1 rounded-lg border text-xs font-bold ${cls}">${escapeHtml(title)}</span>`;
+      });
+
+      if (!isCompleted) {
+        chips.push('<span class="text-slate-400 text-xs font-bold select-none">→</span><span class="inline-flex items-center px-2 py-1 rounded-lg border border-dashed border-verdy-300 text-[11px] font-semibold text-verdy-600 animate-pulse">次を連想中...</span>');
+      }
+      el.liveChainNodes.innerHTML = chips.join('');
+    }
+
+    function startProgressUI(mode) {
       state.isSearching = true;
       state.apiCalls = 0;
       state.scannedCount = 0;
@@ -1356,6 +1665,13 @@
       el.progressPanel.classList.remove('hidden');
       el.resultSection.classList.add('hidden');
       hideMessage();
+
+      if (mode === 'association') {
+        el.liveChainWrap.classList.add('hidden');
+        el.liveChainNodes.innerHTML = '';
+      } else {
+        el.liveChainWrap.classList.add('hidden');
+      }
 
       clearInterval(state.elapsedTimer);
       state.elapsedTimer = setInterval(() => {
@@ -1373,37 +1689,38 @@
       el.progressPanel.classList.add('hidden');
     }
 
-    async function runRouteSearch(rawQuery) {
+    // =========================================================================
+    // モード別メイン検索エントリ
+    // =========================================================================
+
+    async function runSearch(rawQuery, options = {}) {
       const query = (rawQuery || '').trim();
       if (!query) {
-        showMessage('warning', 'キーワードを入力してください', '出発するWikipedia記事の名前やキーワードを入力してから検索ボタンを押してください。');
+        showMessage('warning', 'キーワードを入力してください', '出発するWikipedia記事の名前やキーワードを入力してからボタンを押してください。');
         el.startInput.focus();
         return;
       }
 
       closeSuggestions();
 
-      // 既存の検索が動いていれば中断
       if (state.abortController) {
         state.abortController.abort();
       }
       state.abortController = new AbortController();
       const { signal } = state.abortController;
+      const modeAtSearch = options.forceMode || state.searchMode;
       const excludeTokyoAtSearch = state.excludeTokyo;
 
-      startProgressUI();
+      startProgressUI(modeAtSearch);
 
       try {
-        // ゴールキャッシュが未完了なら待機
         if (!state.cacheReady) {
           updateProgress('東京ヴェルディ周辺のリンクキャッシュを準備中...', '初期準備');
           await initGoalCache();
           if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
         }
 
-        // -----------------------------------------------------------------
-        // Step 0: 出発記事を解決
-        // -----------------------------------------------------------------
+        // 出発記事を解決
         updateProgress(`「${query}」のWikipedia記事を確認中...`, '記事確認');
         const resolved = await resolveStartArticle(query, signal);
         if (!resolved) {
@@ -1422,6 +1739,7 @@
         // 0クリック判定（すでに東京ヴェルディ）
         if (isGoalTitle(startTitle)) {
           await finalizeSearchResult({
+            mode: modeAtSearch,
             startTitle: state.canonicalGoal,
             note: resolved.note,
             excludeTokyo: excludeTokyoAtSearch,
@@ -1430,321 +1748,31 @@
           return;
         }
 
-        // -----------------------------------------------------------------
-        // Step 1: 1クリック検索（出発記事の本文リンクを取得・脚注と一覧表を除外）
-        // -----------------------------------------------------------------
-        updateProgress(`「${startTitle}」の本文リンク（脚注・一覧除外）を解析中...`, '1クリック検索');
-        const startCleanSet = await getCleanBodyLinks(startTitle, signal);
-
-        for (const alias of state.goalAliases) {
-          if (startCleanSet.has(alias)) {
-            await finalizeSearchResult({
-              startTitle,
-              note: resolved.note,
-              excludeTokyo: excludeTokyoAtSearch,
-              routes: [[startTitle, state.canonicalGoal]]
-            });
-            return;
-          }
-        }
-
-        const allowedLevel1Links = Array.from(startCleanSet).filter(
-          (t) => t !== startTitle && !isGoalTitle(t) && !isExcludedIntermediate(t, excludeTokyoAtSearch)
-        );
-
-        if (allowedLevel1Links.length === 0) {
-          showMessage(
-            'warning',
-            '本文中にたどれるリンクが見つかりませんでした',
-            `「${startTitle}」の本文領域（脚注・一覧表を除く）に他のWikipedia記事へのリンクが見つかりませんでした。`
-          );
-          return;
-        }
-
-        // -----------------------------------------------------------------
-        // Step 2: 2クリック検索（出発 → [中継A] → 東京ヴェルディ）
-        // -----------------------------------------------------------------
-        updateProgress('2クリックで到達できるルートを照合・本文検証中...', '2クリック検索');
-
-        const twoHopCandidates = allowedLevel1Links.filter((t) => state.goalBacklinks.has(t));
-        if (twoHopCandidates.length > 0) {
-          const verifiedTwoHop = await filterVerifiedGoalSources(twoHopCandidates, 3, signal);
-          if (verifiedTwoHop.length > 0) {
-            const routes = verifiedTwoHop.map((mid) => [startTitle, mid, state.canonicalGoal]);
-            await finalizeSearchResult({
-              startTitle,
-              note: resolved.note,
-              excludeTokyo: excludeTokyoAtSearch,
-              routes
-            });
-            return;
-          }
-        }
-
-        // -----------------------------------------------------------------
-        // Step 3: 3クリック検索（出発 → [中継A] → [中継B] → 東京ヴェルディ）
-        // -----------------------------------------------------------------
-        const prioritizedL1 = prioritizeCandidates(allowedLevel1Links, excludeTokyoAtSearch);
-        const activeDirectHubs = Array.from(state.verifiedDirectHubs).filter(
-          (t) => !isExcludedIntermediate(t, excludeTokyoAtSearch)
-        );
-
-        const verifyThreeHopPairs = async (pairs, maxPairsToCheck, maxRoutesNeeded) => {
-          const verifiedRoutes = [];
-          const usedRouteKey = new Set();
-          const limit = Math.min(pairs.length, maxPairsToCheck);
-
-          for (let i = 0; i < limit && verifiedRoutes.length < maxRoutesNeeded; i += 2) {
-            if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
-            const batch = pairs.slice(i, i + 2);
-
-            const checks = await runWithConcurrency(
-              batch,
-              2,
-              async (pair) => {
-                try {
-                  const cleanA = await getCleanBodyLinks(pair.midA, signal);
-                  if (!cleanA.has(pair.midB)) return null;
-                  const okGoal = await verifyCleanLinkToGoal(pair.midB, signal);
-                  return okGoal ? [startTitle, pair.midA, pair.midB, state.canonicalGoal] : null;
-                } catch (e) {
-                  if (e.name === 'AbortError' || e.isRateLimit) throw e;
-                  return null;
-                }
-              },
-              signal
-            );
-
-            for (const route of checks) {
-              if (!route) continue;
-              const key = route.join('->');
-              if (!usedRouteKey.has(key)) {
-                usedRouteKey.add(key);
-                verifiedRoutes.push(route);
-                if (verifiedRoutes.length >= maxRoutesNeeded) break;
-              }
-            }
-          }
-          return verifiedRoutes;
-        };
-
-        // Phase 3A: pltitles を使い、1回のAPI呼び出しで最大50件の中継候補と主要ハブを高速照合
-        if (activeDirectHubs.length > 0) {
-          updateProgress('3クリックルートを高速照合中（主要ハブ経由）...', '3クリック検索');
-          const fastL1 = prioritizedL1.slice(0, 50);
-          const hubMatchMap = await batchCheckLinksToTargets(fastL1, activeDirectHubs, signal);
-
-          const fastPairs = [];
-          const seenFast = new Set();
-          for (const midA of fastL1) {
-            const matchedHubs = hubMatchMap.get(midA) || [];
-            for (const midB of matchedHubs) {
-              if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
-              if (isExcludedIntermediate(midB, excludeTokyoAtSearch)) continue;
-              const pairKey = `${midA}>>>${midB}`;
-              if (!seenFast.has(pairKey)) {
-                seenFast.add(pairKey);
-                fastPairs.push({ midA, midB });
-              }
-            }
-          }
-
-          if (fastPairs.length > 0) {
-            updateProgress('3クリック候補の本文リンク（脚注・一覧除外）を検証中...', '3クリック検証');
-            fastPairs.sort((a, b) => {
-              const score = (p) =>
-                (PRIORITY_BRIDGE_HUBS.has(p.midA) ? 2 : 0) +
-                (isDateOrListTitle(p.midA) ? -2 : 0) +
-                (isDateOrListTitle(p.midB) ? -2 : 0);
-              return score(b) - score(a);
-            });
-
-            const verifiedFastRoutes = await verifyThreeHopPairs(fastPairs, 12, 3);
-            if (verifiedFastRoutes.length > 0) {
-              await finalizeSearchResult({
-                startTitle,
-                note: resolved.note,
-                excludeTokyo: excludeTokyoAtSearch,
-                routes: verifiedFastRoutes
-              });
-              return;
-            }
-          }
-        }
-
-        // Phase 3B: ハブ以外（一般被リンク）を経由する3クリックルートをフォールバック検索
-        updateProgress('3クリックルートを検索中（中継記事のリンクを展開）...', '3クリック検索');
-
-        const l1ToExpand = prioritizedL1.slice(0, 30);
-        const l1OutgoingMap = await batchFetchOutgoingLinks(l1ToExpand, signal);
-
-        const threeHopCandidatePairs = [];
-        const seenMidB = new Set();
-
-        for (const midA of l1ToExpand) {
-          const outLinks = l1OutgoingMap.get(midA) || [];
-          for (const midB of outLinks) {
-            if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
-            if (isExcludedIntermediate(midB, excludeTokyoAtSearch)) continue;
-
-            if (state.goalBacklinks.has(midB)) {
-              const pairKey = `${midA}>>>${midB}`;
-              if (!seenMidB.has(pairKey)) {
-                seenMidB.add(pairKey);
-                threeHopCandidatePairs.push({ midA, midB });
-              }
-            }
-          }
-        }
-
-        if (threeHopCandidatePairs.length > 0) {
-          updateProgress('3クリック候補の本文リンク（脚注・一覧除外）を検証中...', '3クリック検証');
-          threeHopCandidatePairs.sort((a, b) => {
-            const score = (p) =>
-              (state.verifiedDirectHubs.has(p.midB) ? 4 : 0) +
-              (PRIORITY_BRIDGE_HUBS.has(p.midA) ? 2 : 0) +
-              (isDateOrListTitle(p.midA) ? -2 : 0) +
-              (isDateOrListTitle(p.midB) ? -2 : 0);
-            return score(b) - score(a);
+        if (modeAtSearch === 'association') {
+          await executeAssociationMode({
+            startTitle,
+            note: resolved.note,
+            excludeTokyo: excludeTokyoAtSearch,
+            avoidPreviousFirstHop: Boolean(options.avoidPreviousFirstHop),
+            signal
           });
-
-          const verifiedThreeHopRoutes = await verifyThreeHopPairs(threeHopCandidatePairs, 16, 3);
-          if (verifiedThreeHopRoutes.length > 0) {
-            await finalizeSearchResult({
-              startTitle,
-              note: resolved.note,
-              excludeTokyo: excludeTokyoAtSearch,
-              routes: verifiedThreeHopRoutes
-            });
-            return;
-          }
+        } else {
+          await executeShortestSearch({
+            startTitle,
+            note: resolved.note,
+            excludeTokyo: excludeTokyoAtSearch,
+            signal
+          });
         }
-
-        // -----------------------------------------------------------------
-        // Step 4: 4クリック検索（出発 → [A] → [B] → [C] → 東京ヴェルディ）
-        // -----------------------------------------------------------------
-        updateProgress('4クリックルートを検索中（主要ハブを経由して検索）...', '4クリック検索');
-
-        const topMidAs = l1ToExpand.slice(0, 12);
-        const l2ParentMap = new Map();
-        const l2Candidates = [];
-
-        for (const midA of topMidAs) {
-          const outA = l1OutgoingMap.get(midA) || [];
-          for (const midB of outA) {
-            if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
-            if (isExcludedIntermediate(midB, excludeTokyoAtSearch)) continue;
-            if (!l2ParentMap.has(midB)) {
-              l2ParentMap.set(midB, midA);
-              l2Candidates.push(midB);
-            }
-          }
-        }
-
-        const prioritizedL2 = prioritizeCandidates(l2Candidates, excludeTokyoAtSearch).slice(0, 50);
-        const fourHopCandidates = [];
-
-        if (prioritizedL2.length > 0 && activeDirectHubs.length > 0) {
-          const l2HubMap = await batchCheckLinksToTargets(prioritizedL2, activeDirectHubs, signal);
-          for (const midB of prioritizedL2) {
-            const midA = l2ParentMap.get(midB);
-            const matchedC = l2HubMap.get(midB) || [];
-            for (const midC of matchedC) {
-              if (midC === startTitle || midC === midA || midC === midB || isGoalTitle(midC)) continue;
-              if (isExcludedIntermediate(midC, excludeTokyoAtSearch)) continue;
-              fourHopCandidates.push({ midA, midB, midC });
-              if (fourHopCandidates.length >= 16) break;
-            }
-            if (fourHopCandidates.length >= 16) break;
-          }
-        }
-
-        if (fourHopCandidates.length === 0 && prioritizedL2.length > 0) {
-          const l2Sample = prioritizedL2.slice(0, 20);
-          const l2OutgoingMap = await batchFetchOutgoingLinks(l2Sample, signal);
-          for (const midB of l2Sample) {
-            const midA = l2ParentMap.get(midB);
-            const outB = l2OutgoingMap.get(midB) || [];
-            for (const midC of outB) {
-              if (midC === startTitle || midC === midA || midC === midB || isGoalTitle(midC)) continue;
-              if (isExcludedIntermediate(midC, excludeTokyoAtSearch)) continue;
-              if (state.goalBacklinks.has(midC)) {
-                fourHopCandidates.push({ midA, midB, midC });
-                if (fourHopCandidates.length >= 16) break;
-              }
-            }
-            if (fourHopCandidates.length >= 16) break;
-          }
-        }
-
-        if (fourHopCandidates.length > 0) {
-          updateProgress('4クリック候補の本文リンクを検証中...', '4クリック検証');
-
-          const verifiedFourHopRoutes = [];
-          const usedKeys = new Set();
-
-          for (let i = 0; i < fourHopCandidates.length && verifiedFourHopRoutes.length < 2; i += 2) {
-            if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
-            const batch = fourHopCandidates.slice(i, i + 2);
-            const checks = await runWithConcurrency(
-              batch,
-              2,
-              async (cand) => {
-                try {
-                  const cleanA = await getCleanBodyLinks(cand.midA, signal);
-                  if (!cleanA.has(cand.midB)) return null;
-                  const cleanB = await getCleanBodyLinks(cand.midB, signal);
-                  if (!cleanB.has(cand.midC)) return null;
-                  const okGoal = await verifyCleanLinkToGoal(cand.midC, signal);
-                  return okGoal
-                    ? [startTitle, cand.midA, cand.midB, cand.midC, state.canonicalGoal]
-                    : null;
-                } catch (e) {
-                  if (e.name === 'AbortError' || e.isRateLimit) throw e;
-                  return null;
-                }
-              },
-              signal
-            );
-
-            for (const route of checks) {
-              if (!route) continue;
-              const key = route.join('->');
-              if (!usedKeys.has(key)) {
-                usedKeys.add(key);
-                verifiedFourHopRoutes.push(route);
-                if (verifiedFourHopRoutes.length >= 2) break;
-              }
-            }
-          }
-
-          if (verifiedFourHopRoutes.length > 0) {
-            await finalizeSearchResult({
-              startTitle,
-              note: resolved.note,
-              excludeTokyo: excludeTokyoAtSearch,
-              routes: verifiedFourHopRoutes
-            });
-            return;
-          }
-        }
-
-        // 4クリック以内で見つからなかった場合
-        const excludeText = excludeTokyoAtSearch ? '（「東京都」も除外）' : '';
-        showMessage(
-          'warning',
-          '4クリック以内のルートが見つかりませんでした',
-          `「${startTitle}」から本文リンク限定${excludeText}で4クリック以内に「${state.canonicalGoal}」へ到達する経路を発見できませんでした。${excludeTokyoAtSearch ? '「「東京都」を除外」をOFFにするか、' : ''}別のキーワードをお試しください。`
-        );
       } catch (err) {
         if (err.name === 'AbortError') {
-          showMessage('info', '検索をキャンセルしました', '別のキーワードを入力してもう一度検索できます。');
+          showMessage('info', '検索をキャンセルしました', '別のキーワードを入力してもう一度試せます。');
         } else if (err.isRateLimit) {
           console.error('検索エラー (レート制限):', err);
           showMessage(
             'warning',
             'Wikipediaへのアクセスが混み合っています（HTTP 429）',
-            '短時間に多くのAPIリクエストが送信されたため、Wikipedia側で一時的に制限がかかりました。10〜20秒ほど待ってからもう一度検索をお試しください。'
+            '短時間に多くのAPIリクエストが送信されたため、Wikipedia側で一時的に制限がかかりました。10〜20秒ほど待ってからもう一度お試しください。'
           );
         } else {
           console.error('検索エラー:', err);
@@ -1757,6 +1785,525 @@
       } finally {
         stopProgressUI();
       }
+    }
+
+    // =========================================================================
+    // 1. 連想モード（片方向で1手ずつ本文リンクをたどる）
+    // =========================================================================
+
+    async function executeAssociationMode({ startTitle, note, excludeTokyo, avoidPreviousFirstHop, signal }) {
+      const MAX_STEPS = 8;
+      const chain = [startTitle];
+      const visited = new Set([startTitle]);
+      const deadEnds = new Set();
+
+      if (!state.usedAssociationFirstHops.has(startTitle)) {
+        state.usedAssociationFirstHops.set(startTitle, new Set());
+      }
+      const prevFirstHops = state.usedAssociationFirstHops.get(startTitle);
+
+      const getActiveLandingHubs = () =>
+        Array.from(state.verifiedDirectHubs).filter(
+          (t) =>
+            !isExcludedIntermediate(t, excludeTokyo) &&
+            !state.rejectedGoalSources.has(t) &&
+            !deadEnds.has(t) &&
+            !visited.has(t)
+        );
+
+      renderLiveChain(chain, false);
+
+      let safetyIterations = 0;
+      while (chain.length - 1 < MAX_STEPS && safetyIterations < 14) {
+        safetyIterations += 1;
+        if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+
+        const current = chain[chain.length - 1];
+        const stepNum = chain.length; // これから行うクリック数（1, 2, 3...）
+
+        updateProgress(`「${current}」の本文から次の連想ワードを探しています...`, `連想 ${stepNum}手目`);
+        const cleanSet = await getCleanBodyLinks(current, signal);
+
+        // 1. 直接ゴール記事へリンクしているかチェック
+        for (const alias of state.goalAliases) {
+          if (cleanSet.has(alias)) {
+            chain.push(state.canonicalGoal);
+            renderLiveChain(chain, true);
+            await finalizeSearchResult({
+              mode: 'association',
+              startTitle,
+              note,
+              excludeTokyo,
+              routes: [chain]
+            });
+            return;
+          }
+        }
+
+        // 本文出現順の候補リストを作成
+        const orderedLinks = Array.from(cleanSet).filter(
+          (t) =>
+            !visited.has(t) &&
+            !deadEnds.has(t) &&
+            !isGoalTitle(t) &&
+            !isExcludedIntermediate(t, excludeTokyo)
+        );
+
+        // 行き止まりの場合は1手戻って別ルートを試す
+        if (orderedLinks.length === 0) {
+          if (chain.length > 1) {
+            const popped = chain.pop();
+            deadEnds.add(popped);
+            renderLiveChain(chain, false);
+            continue;
+          }
+          break;
+        }
+
+        const nonDateLinks = orderedLinks.filter((t) => !isDateOrListTitle(t));
+        const workingLinks = nonDateLinks.length > 0 ? nonDateLinks : orderedLinks;
+
+        // 2. ゴールへ1クリックで届く記事が本文中にあるかチェック
+        const directGoalBacklinks = workingLinks.filter(
+          (t) => state.goalBacklinks.has(t) && !state.rejectedGoalSources.has(t)
+        );
+
+        // 1手目では超一般ハブ（日本・日本テレビ・読売新聞など）への即着地を避け、連想ゲーム感を優先する
+        const specificGoalBacklinks = directGoalBacklinks.filter((t) => !GENERIC_EARLY_HUBS.has(t));
+        const shouldTryLandingNow =
+          (stepNum === 1 && specificGoalBacklinks.length > 0 && !avoidPreviousFirstHop) ||
+          (stepNum >= 2 && directGoalBacklinks.length > 0);
+
+        if (shouldTryLandingNow) {
+          const candidatesToVerify = stepNum === 1
+            ? specificGoalBacklinks.slice(0, 4)
+            : [...specificGoalBacklinks, ...directGoalBacklinks.filter((t) => GENERIC_EARLY_HUBS.has(t))].slice(0, 5);
+
+          updateProgress(`「${current}」から東京ヴェルディへつながる連想先を検証中...`, `連想 ${stepNum}手目`);
+          const verifiedLandings = await filterVerifiedGoalSources(candidatesToVerify, 1, signal, true);
+          if (verifiedLandings.length > 0) {
+            const chosenMid = verifiedLandings[Math.floor(Math.random() * verifiedLandings.length)];
+            if (stepNum === 1) prevFirstHops.add(chosenMid);
+            chain.push(chosenMid, state.canonicalGoal);
+            renderLiveChain(chain, true);
+            await finalizeSearchResult({
+              mode: 'association',
+              startTitle,
+              note,
+              excludeTokyo,
+              routes: [chain]
+            });
+            return;
+          }
+        }
+
+        // 3. 次の1手を選ぶ（序盤は記事冒頭の固有語を優先、中盤以降はゴール方向へ緩やかに収束）
+        let nextTitle = null;
+
+        if (stepNum === 1) {
+          // 1手目：記事冒頭〜前半にある、その単語らしい固有キーワードを優先（超一般語・前回使用語は後回し）
+          const leadSlice = workingLinks.slice(0, 40);
+          let topicalPool = leadSlice.filter((t) => !GENERIC_EARLY_HUBS.has(t) && !prevFirstHops.has(t));
+          if (topicalPool.length === 0) {
+            topicalPool = leadSlice.filter((t) => !GENERIC_EARLY_HUBS.has(t));
+          }
+          if (topicalPool.length === 0) {
+            topicalPool = workingLinks.filter((t) => !prevFirstHops.has(t));
+          }
+          if (topicalPool.length === 0) {
+            prevFirstHops.clear();
+            topicalPool = workingLinks;
+          }
+
+          // 冒頭上位から少しランダム性を持たせて選ぶ
+          const candidateSlice = topicalPool.slice(0, Math.min(18, topicalPool.length));
+          nextTitle = pickWeightedRandom(candidateSlice, 10);
+          if (nextTitle) prevFirstHops.add(nextTitle);
+        } else if (stepNum === 2) {
+          // 2手目：1回だけ軽量照合し、面白いつながり先があれば優先、なければ冒頭寄りから連想を進める
+          const activeHubs = getActiveLandingHubs();
+          const sampleForCheck = workingLinks
+            .filter((t) => !GENERIC_EARLY_HUBS.has(t))
+            .slice(0, 35);
+
+          let steered = [];
+          if (sampleForCheck.length > 0 && activeHubs.length > 0) {
+            const matchMap = await batchCheckLinksToTargets(sampleForCheck, activeHubs, signal);
+            for (const cand of sampleForCheck) {
+              const hits = matchMap.get(cand) || [];
+              if (hits.length > 0) {
+                const hasSpecificHit = hits.some((h) => !GENERIC_EARLY_HUBS.has(h));
+                steered.push({ title: cand, score: (hasSpecificHit ? 5 : 2) + Math.random() * 2 });
+              }
+            }
+          }
+
+          if (steered.length > 0 && Math.random() < 0.65) {
+            steered.sort((a, b) => b.score - a.score);
+            nextTitle = pickWeightedRandom(steered.map((s) => s.title), 4);
+          } else {
+            const pool = workingLinks.filter((t) => !GENERIC_EARLY_HUBS.has(t)).slice(0, 20);
+            nextTitle = pickWeightedRandom(pool.length > 0 ? pool : workingLinks, 10);
+          }
+        } else {
+          // 3手目以降：東京ヴェルディへ自然に着地できるよう、1回の軽量照合で着地ハブへつながるリンクを優先
+          const activeHubs = getActiveLandingHubs();
+          const sampleForCheck = workingLinks.slice(0, 45);
+
+          if (sampleForCheck.length > 0 && activeHubs.length > 0) {
+            updateProgress(`「${current}」から東京ヴェルディへ近づく連想先を検索中...`, `連想 ${stepNum}手目`);
+            const matchMap = await batchCheckLinksToTargets(sampleForCheck, activeHubs, signal);
+            const scored = [];
+            for (let idx = 0; idx < sampleForCheck.length; idx++) {
+              const cand = sampleForCheck[idx];
+              const hits = matchMap.get(cand) || [];
+              if (hits.length > 0) {
+                const specificBonus = !GENERIC_EARLY_HUBS.has(cand) ? 4 : 0;
+                const hitBonus = hits.some((h) => !GENERIC_EARLY_HUBS.has(h)) ? 4 : 1;
+                const posBonus = Math.max(0, 3 - idx * 0.08);
+                scored.push({ title: cand, score: specificBonus + hitBonus + posBonus + Math.random() * 1.5 });
+              }
+            }
+            if (scored.length > 0) {
+              scored.sort((a, b) => b.score - a.score);
+              nextTitle = pickWeightedRandom(scored.map((s) => s.title), 3);
+            }
+          }
+
+          // まだ着地ハブに届かない場合は中継ハブ経由で日本・スポーツ・メディア圏へ寄せる
+          if (!nextTitle) {
+            const bridgeInLinks = workingLinks.filter((t) => PRIORITY_BRIDGE_HUBS.has(t));
+            if (bridgeInLinks.length > 0) {
+              nextTitle = pickWeightedRandom(bridgeInLinks, 5);
+            } else {
+              nextTitle = pickWeightedRandom(workingLinks.slice(0, 15), 8);
+            }
+          }
+        }
+
+        if (!nextTitle) {
+          if (chain.length > 1) {
+            const popped = chain.pop();
+            deadEnds.add(popped);
+            renderLiveChain(chain, false);
+            continue;
+          }
+          break;
+        }
+
+        chain.push(nextTitle);
+        visited.add(nextTitle);
+        renderLiveChain(chain, false);
+      }
+
+      // 規定手数内に着地できなかった場合
+      const excludeText = excludeTokyo ? '（「東京都」除外）' : '';
+      showMessage(
+        'warning',
+        `${MAX_STEPS}手以内の連想でゴールに届きませんでした`,
+        `「${startTitle}」からの連想ルート（${chain.join(' → ')}）では${MAX_STEPS}手以内に東京ヴェルディへ到達できませんでした${excludeText}。もう一度ボタンを押して別の連想を試すか、「最短ルート検索」タブもお試しください。`
+      );
+    }
+
+    // =========================================================================
+    // 2. 最短ルート検索（0〜4クリック・双方向リアルタイム・本文リンク限定）
+    // =========================================================================
+
+    async function executeShortestSearch({ startTitle, note, excludeTokyo, signal }) {
+      // Step 1: 1クリック検索（出発記事の本文リンクを取得・脚注と一覧表を除外）
+      updateProgress(`「${startTitle}」の本文リンク（脚注・一覧除外）を解析中...`, '1クリック検索');
+      const startCleanSet = await getCleanBodyLinks(startTitle, signal);
+
+      for (const alias of state.goalAliases) {
+        if (startCleanSet.has(alias)) {
+          await finalizeSearchResult({
+            mode: 'shortest',
+            startTitle,
+            note,
+            excludeTokyo,
+            routes: [[startTitle, state.canonicalGoal]]
+          });
+          return;
+        }
+      }
+
+      const allowedLevel1Links = Array.from(startCleanSet).filter(
+        (t) => t !== startTitle && !isGoalTitle(t) && !isExcludedIntermediate(t, excludeTokyo)
+      );
+
+      if (allowedLevel1Links.length === 0) {
+        showMessage(
+          'warning',
+          '本文中にたどれるリンクが見つかりませんでした',
+          `「${startTitle}」の本文領域（脚注・一覧表を除く）に他のWikipedia記事へのリンクが見つかりませんでした。`
+        );
+        return;
+      }
+
+      // Step 2: 2クリック検索（出発 → [中継A] → 東京ヴェルディ）
+      updateProgress('2クリックで到達できるルートを照合・本文検証中...', '2クリック検索');
+
+      const twoHopCandidates = allowedLevel1Links.filter((t) => state.goalBacklinks.has(t));
+      if (twoHopCandidates.length > 0) {
+        const verifiedTwoHop = await filterVerifiedGoalSources(twoHopCandidates, 3, signal);
+        if (verifiedTwoHop.length > 0) {
+          const routes = verifiedTwoHop.map((mid) => [startTitle, mid, state.canonicalGoal]);
+          await finalizeSearchResult({
+            mode: 'shortest',
+            startTitle,
+            note,
+            excludeTokyo,
+            routes
+          });
+          return;
+        }
+      }
+
+      // Step 3: 3クリック検索（出発 → [中継A] → [中継B] → 東京ヴェルディ）
+      const prioritizedL1 = prioritizeCandidates(allowedLevel1Links, excludeTokyo);
+      const activeDirectHubs = Array.from(state.verifiedDirectHubs).filter(
+        (t) => !isExcludedIntermediate(t, excludeTokyo) && !state.rejectedGoalSources.has(t)
+      );
+
+      const verifyThreeHopPairs = async (pairs, maxPairsToCheck, maxRoutesNeeded) => {
+        const verifiedRoutes = [];
+        const usedRouteKey = new Set();
+        const limit = Math.min(pairs.length, maxPairsToCheck);
+
+        for (let i = 0; i < limit && verifiedRoutes.length < maxRoutesNeeded; i += 4) {
+          if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+          const batch = pairs.slice(i, i + 4);
+
+          // バッチ内の中継A・中継Bの本文を一括取得してAPI通信回数を最小化
+          const midAs = Array.from(new Set(batch.map((p) => p.midA)));
+          const cleanAMap = await batchGetCleanBodyLinks(midAs, signal);
+
+          const validPairs = batch.filter((p) => {
+            const cleanA = cleanAMap.get(normalizeTitle(p.midA));
+            return Boolean(cleanA && cleanA.has(p.midB));
+          });
+          if (validPairs.length === 0) continue;
+
+          const midBs = Array.from(new Set(validPairs.map((p) => p.midB)));
+          const verifiedBs = new Set(await batchVerifyCleanLinksToGoal(midBs, signal));
+
+          for (const pair of validPairs) {
+            if (!verifiedBs.has(pair.midB)) continue;
+            const route = [startTitle, pair.midA, pair.midB, state.canonicalGoal];
+            const key = route.join('->');
+            if (!usedRouteKey.has(key)) {
+              usedRouteKey.add(key);
+              verifiedRoutes.push(route);
+              if (verifiedRoutes.length >= maxRoutesNeeded) break;
+            }
+          }
+        }
+        return verifiedRoutes;
+      };
+
+      // Phase 3A: pltitles を使い、1回のAPI呼び出しで最大50件の中継候補と主要ハブを高速照合
+      if (activeDirectHubs.length > 0) {
+        updateProgress('3クリックルートを高速照合中（主要ハブ経由）...', '3クリック検索');
+        const fastL1 = prioritizedL1.slice(0, 50);
+        const hubMatchMap = await batchCheckLinksToTargets(fastL1, activeDirectHubs, signal);
+
+        const fastPairs = [];
+        const seenFast = new Set();
+        for (const midA of fastL1) {
+          const matchedHubs = hubMatchMap.get(midA) || [];
+          for (const midB of matchedHubs) {
+            if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
+            if (isExcludedIntermediate(midB, excludeTokyo)) continue;
+            const pairKey = `${midA}>>>${midB}`;
+            if (!seenFast.has(pairKey)) {
+              seenFast.add(pairKey);
+              fastPairs.push({ midA, midB });
+            }
+          }
+        }
+
+        if (fastPairs.length > 0) {
+          updateProgress('3クリック候補の本文リンク（脚注・一覧除外）を検証中...', '3クリック検証');
+          fastPairs.sort((a, b) => {
+            const score = (p) =>
+              (PRIORITY_BRIDGE_HUBS.has(p.midA) ? 2 : 0) +
+              (isDateOrListTitle(p.midA) ? -2 : 0) +
+              (isDateOrListTitle(p.midB) ? -2 : 0);
+            return score(b) - score(a);
+          });
+
+          const verifiedFastRoutes = await verifyThreeHopPairs(fastPairs, 12, 3);
+          if (verifiedFastRoutes.length > 0) {
+            await finalizeSearchResult({
+              mode: 'shortest',
+              startTitle,
+              note,
+              excludeTokyo,
+              routes: verifiedFastRoutes
+            });
+            return;
+          }
+        }
+      }
+
+      // Phase 3B: ハブ以外（一般被リンク）を経由する3クリックルートをフォールバック検索
+      updateProgress('3クリックルートを検索中（中継記事のリンクを展開）...', '3クリック検索');
+
+      const l1ToExpand = prioritizedL1.slice(0, 30);
+      const l1OutgoingMap = await batchFetchOutgoingLinks(l1ToExpand, signal);
+
+      const threeHopCandidatePairs = [];
+      const seenMidB = new Set();
+
+      for (const midA of l1ToExpand) {
+        const outLinks = l1OutgoingMap.get(midA) || [];
+        for (const midB of outLinks) {
+          if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
+          if (isExcludedIntermediate(midB, excludeTokyo)) continue;
+
+          if (state.goalBacklinks.has(midB)) {
+            const pairKey = `${midA}>>>${midB}`;
+            if (!seenMidB.has(pairKey)) {
+              seenMidB.add(pairKey);
+              threeHopCandidatePairs.push({ midA, midB });
+            }
+          }
+        }
+      }
+
+      if (threeHopCandidatePairs.length > 0) {
+        updateProgress('3クリック候補の本文リンク（脚注・一覧除外）を検証中...', '3クリック検証');
+        threeHopCandidatePairs.sort((a, b) => {
+          const score = (p) =>
+            (state.verifiedDirectHubs.has(p.midB) ? 4 : 0) +
+            (PRIORITY_BRIDGE_HUBS.has(p.midA) ? 2 : 0) +
+            (isDateOrListTitle(p.midA) ? -2 : 0) +
+            (isDateOrListTitle(p.midB) ? -2 : 0);
+          return score(b) - score(a);
+        });
+
+        const verifiedThreeHopRoutes = await verifyThreeHopPairs(threeHopCandidatePairs, 16, 3);
+        if (verifiedThreeHopRoutes.length > 0) {
+          await finalizeSearchResult({
+            mode: 'shortest',
+            startTitle,
+            note,
+            excludeTokyo,
+            routes: verifiedThreeHopRoutes
+          });
+          return;
+        }
+      }
+
+      // Step 4: 4クリック検索（出発 → [A] → [B] → [C] → 東京ヴェルディ）
+      updateProgress('4クリックルートを検索中（主要ハブを経由して検索）...', '4クリック検索');
+
+      const topMidAs = l1ToExpand.slice(0, 12);
+      const l2ParentMap = new Map();
+      const l2Candidates = [];
+
+      for (const midA of topMidAs) {
+        const outA = l1OutgoingMap.get(midA) || [];
+        for (const midB of outA) {
+          if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
+          if (isExcludedIntermediate(midB, excludeTokyo)) continue;
+          if (!l2ParentMap.has(midB)) {
+            l2ParentMap.set(midB, midA);
+            l2Candidates.push(midB);
+          }
+        }
+      }
+
+      const prioritizedL2 = prioritizeCandidates(l2Candidates, excludeTokyo).slice(0, 50);
+      const fourHopCandidates = [];
+
+      if (prioritizedL2.length > 0 && activeDirectHubs.length > 0) {
+        const l2HubMap = await batchCheckLinksToTargets(prioritizedL2, activeDirectHubs, signal);
+        for (const midB of prioritizedL2) {
+          const midA = l2ParentMap.get(midB);
+          const matchedC = l2HubMap.get(midB) || [];
+          for (const midC of matchedC) {
+            if (midC === startTitle || midC === midA || midC === midB || isGoalTitle(midC)) continue;
+            if (isExcludedIntermediate(midC, excludeTokyo)) continue;
+            fourHopCandidates.push({ midA, midB, midC });
+            if (fourHopCandidates.length >= 16) break;
+          }
+          if (fourHopCandidates.length >= 16) break;
+        }
+      }
+
+      if (fourHopCandidates.length === 0 && prioritizedL2.length > 0) {
+        const l2Sample = prioritizedL2.slice(0, 20);
+        const l2OutgoingMap = await batchFetchOutgoingLinks(l2Sample, signal);
+        for (const midB of l2Sample) {
+          const midA = l2ParentMap.get(midB);
+          const outB = l2OutgoingMap.get(midB) || [];
+          for (const midC of outB) {
+            if (midC === startTitle || midC === midA || midC === midB || isGoalTitle(midC)) continue;
+            if (isExcludedIntermediate(midC, excludeTokyo)) continue;
+            if (state.goalBacklinks.has(midC)) {
+              fourHopCandidates.push({ midA, midB, midC });
+              if (fourHopCandidates.length >= 16) break;
+            }
+          }
+          if (fourHopCandidates.length >= 16) break;
+        }
+      }
+
+      if (fourHopCandidates.length > 0) {
+        updateProgress('4クリック候補の本文リンクを検証中...', '4クリック検証');
+
+        const verifiedFourHopRoutes = [];
+        const usedKeys = new Set();
+
+        for (let i = 0; i < fourHopCandidates.length && verifiedFourHopRoutes.length < 2; i += 3) {
+          if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+          const batch = fourHopCandidates.slice(i, i + 3);
+
+          const midAs = Array.from(new Set(batch.map((c) => c.midA)));
+          const cleanAMap = await batchGetCleanBodyLinks(midAs, signal);
+          const passA = batch.filter((c) => cleanAMap.get(normalizeTitle(c.midA))?.has(c.midB));
+          if (passA.length === 0) continue;
+
+          const midBs = Array.from(new Set(passA.map((c) => c.midB)));
+          const cleanBMap = await batchGetCleanBodyLinks(midBs, signal);
+          const passB = passA.filter((c) => cleanBMap.get(normalizeTitle(c.midB))?.has(c.midC));
+          if (passB.length === 0) continue;
+
+          const midCs = Array.from(new Set(passB.map((c) => c.midC)));
+          const verifiedCs = new Set(await batchVerifyCleanLinksToGoal(midCs, signal));
+
+          for (const cand of passB) {
+            if (!verifiedCs.has(cand.midC)) continue;
+            const route = [startTitle, cand.midA, cand.midB, cand.midC, state.canonicalGoal];
+            const key = route.join('->');
+            if (!usedKeys.has(key)) {
+              usedKeys.add(key);
+              verifiedFourHopRoutes.push(route);
+              if (verifiedFourHopRoutes.length >= 2) break;
+            }
+          }
+        }
+
+        if (verifiedFourHopRoutes.length > 0) {
+          await finalizeSearchResult({
+            mode: 'shortest',
+            startTitle,
+            note,
+            excludeTokyo,
+            routes: verifiedFourHopRoutes
+          });
+          return;
+        }
+      }
+
+      // 4クリック以内で見つからなかった場合
+      const excludeText = excludeTokyo ? '（「東京都」も除外）' : '';
+      showMessage(
+        'warning',
+        '4クリック以内のルートが見つかりませんでした',
+        `「${startTitle}」から本文リンク限定${excludeText}で4クリック以内に「${state.canonicalGoal}」へ到達する経路を発見できませんでした。${excludeTokyo ? '「「東京都」を除外」をOFFにするか、' : ''}「連想モード」または別のキーワードをお試しください。`
+      );
     }
 
     // =========================================================================
@@ -1814,13 +2361,14 @@
       }
     }
 
-    async function finalizeSearchResult({ startTitle, note, excludeTokyo, routes }) {
+    async function finalizeSearchResult({ mode, startTitle, note, excludeTokyo, routes }) {
       updateProgress('見つかったルートの記事情報を取得中...', '結果表示');
 
       const allTitles = routes.flat();
       await fetchArticleSummaries(allTitles);
 
       state.currentResult = {
+        mode: mode || 'association',
         startTitle,
         note: note || '',
         excludeTokyo: Boolean(excludeTokyo),
@@ -1838,17 +2386,24 @@
 
       const route = res.routes[res.selectedIndex] || res.routes[0];
       const clicks = Math.max(0, route.length - 1);
+      const isAssoc = res.mode === 'association';
 
       el.resultClicksBadge.textContent = clicks === 0 ? '0クリック（ゴール記事そのもの！）' : `${clicks}クリックで到達！`;
+      el.resultModeBadge.textContent = isAssoc ? '連想モード（片方向）' : '最短ルート検索';
+
       if (res.excludeTokyo) {
         el.resultExcludeBadge.classList.remove('hidden');
       } else {
         el.resultExcludeBadge.classList.add('hidden');
       }
 
-      el.resultHeadline.textContent = clicks === 0
-        ? `「${res.startTitle}」はゴール記事そのものです！`
-        : `「${res.startTitle}」から ${clicks}クリック で東京ヴェルディへ到達`;
+      if (clicks === 0) {
+        el.resultHeadline.textContent = `「${res.startTitle}」はゴール記事そのものです！`;
+      } else if (isAssoc) {
+        el.resultHeadline.textContent = `「${res.startTitle}」から ${clicks}クリック の連想で東京ヴェルディへ到達`;
+      } else {
+        el.resultHeadline.textContent = `「${res.startTitle}」から ${clicks}クリック で東京ヴェルディへ到達`;
+      }
 
       if (res.note) {
         el.resultSubnote.textContent = res.note;
@@ -1859,7 +2414,14 @@
 
       el.resultPathSummary.textContent = route.join(' → ');
 
-      // 別ルート切り替えボタン
+      // 連想モード時は「別の連想を試す」ボタンを表示（0クリック時を除く）
+      if (isAssoc && clicks > 0) {
+        el.retryAssociationBtn.classList.remove('hidden');
+      } else {
+        el.retryAssociationBtn.classList.add('hidden');
+      }
+
+      // 別ルート切り替えボタン（最短ルート検索で複数候補がある場合）
       if (res.routes.length > 1) {
         el.altRoutesBar.classList.remove('hidden');
         el.altRoutesButtons.innerHTML = res.routes
@@ -1899,7 +2461,8 @@
             stepBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-verdy-600 text-white">GOAL</span>';
             cardBorder = 'border-verdy-400 bg-verdy-50/40';
           } else {
-            stepBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-verdy-100 text-verdy-800">${idx}クリック目</span>`;
+            const stepLabel = isAssoc ? `連想 ${idx}手目` : `${idx}クリック目`;
+            stepBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-verdy-100 text-verdy-800">${stepLabel}</span>`;
           }
 
           const thumbHtml = info.thumbnail
@@ -1963,10 +2526,21 @@
       if (!res || !res.routes || res.routes.length === 0) return '';
       const route = res.routes[res.selectedIndex] || res.routes[0];
       const clicks = Math.max(0, route.length - 1);
-      const modeLine = res.excludeTokyo ? '（※「東京都」除外モード）\n' : '';
-      const header = clicks === 0
-        ? `「${res.startTitle}」は0クリックで東京ヴェルディ！`
-        : `「${res.startTitle}」から${clicks}クリックで東京ヴェルディに到達！`;
+      const isAssoc = res.mode === 'association';
+
+      const flags = [];
+      if (isAssoc) flags.push('連想モード');
+      if (res.excludeTokyo) flags.push('「東京都」除外');
+      const modeLine = flags.length > 0 ? `（※${flags.join('・')}）\n` : '';
+
+      let header = '';
+      if (clicks === 0) {
+        header = `「${res.startTitle}」は0クリックで東京ヴェルディ！`;
+      } else if (isAssoc) {
+        header = `「${res.startTitle}」から${clicks}クリックの連想で東京ヴェルディに到達！`;
+      } else {
+        header = `「${res.startTitle}」から${clicks}クリックで東京ヴェルディに到達！`;
+      }
 
       const lines = [
         header,
@@ -2045,8 +2619,43 @@
     }
 
     // =========================================================================
-    // 入力補完（OpenSearchサジェスト）・プリセット・ランダム・履歴
+    // モード切り替えUI・入力補完・プリセット・ランダム・履歴
     // =========================================================================
+
+    function updateSearchModeUI() {
+      const isAssoc = state.searchMode === 'association';
+
+      el.modeAssociationBtn.setAttribute('aria-selected', String(isAssoc));
+      el.modeShortestBtn.setAttribute('aria-selected', String(!isAssoc));
+
+      if (isAssoc) {
+        el.modeAssociationBtn.className = 'flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer bg-verdy-600 text-white shadow-sm';
+        el.modeAssociationSub.className = 'text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded bg-white/20 text-verdy-50';
+        el.modeShortestBtn.className = 'flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer text-slate-600 hover:text-slate-800 hover:bg-white/60';
+        el.modeShortestSub.className = 'text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-500';
+        el.modeDescription.textContent = '出発記事の本文リンクを片方向で1手ずつ連想ゲームのようにたどり、東京ヴェルディを目指します（寄り道あり・毎回変化）。';
+        el.searchBtnLabel.textContent = '連想をスタート';
+      } else {
+        el.modeAssociationBtn.className = 'flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer text-slate-600 hover:text-slate-800 hover:bg-white/60';
+        el.modeAssociationSub.className = 'text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-500';
+        el.modeShortestBtn.className = 'flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer bg-verdy-600 text-white shadow-sm';
+        el.modeShortestSub.className = 'text-[10px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded bg-white/20 text-verdy-50';
+        el.modeDescription.textContent = '出発記事と東京ヴェルディの両側からリンクを照合し、最短クリック数（最大4クリック）のルートを検索します。';
+        el.searchBtnLabel.textContent = '最短ルートを検索';
+      }
+    }
+
+    function setSearchMode(newMode) {
+      if (state.searchMode === newMode) return;
+      state.searchMode = newMode;
+      updateSearchModeUI();
+      showToast(newMode === 'association' ? '連想モードに切り替えました' : '最短ルート検索に切り替えました');
+
+      // すでに結果が表示されていて検索中でなければ、新モードで自動再検索
+      if (!state.isSearching && state.currentResult && state.currentResult.startTitle) {
+        runSearch(state.currentResult.startTitle);
+      }
+    }
 
     function closeSuggestions() {
       el.suggestList.classList.add('hidden');
@@ -2121,7 +2730,7 @@
         if (randomTitle) {
           el.startInput.value = randomTitle;
           updateClearBtnVisibility();
-          await runRouteSearch(randomTitle);
+          await runSearch(randomTitle);
         }
       } catch (err) {
         showMessage('error', 'ランダム記事の取得に失敗しました', err.message || '通信状況を確認してもう一度お試しください。');
@@ -2180,6 +2789,7 @@
       if (!route || route.length === 0) return;
 
       const entry = {
+        mode: result.mode || 'association',
         startTitle: result.startTitle,
         clicks: Math.max(0, route.length - 1),
         route,
@@ -2190,7 +2800,13 @@
       state.history = [
         entry,
         ...state.history.filter(
-          (item) => !(item.startTitle === entry.startTitle && item.excludeTokyo === entry.excludeTokyo)
+          (item) =>
+            !(
+              item.startTitle === entry.startTitle &&
+              item.mode === entry.mode &&
+              item.excludeTokyo === entry.excludeTokyo &&
+              (item.route || []).join('->') === route.join('->')
+            )
         )
       ].slice(0, 12);
 
@@ -2223,21 +2839,26 @@
 
       el.historySection.classList.remove('hidden');
       el.historyList.innerHTML = state.history
-        .map(
-          (item, idx) => `
+        .map((item, idx) => {
+          const isAssoc = item.mode === 'association';
+          const modePill = isAssoc
+            ? '<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">連想モード</span>'
+            : '<span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">最短ルート</span>';
+          return `
           <button type="button" data-history-idx="${idx}"
                   class="w-full text-left py-3 px-2 -mx-2 rounded-xl hover:bg-slate-50 transition flex items-start justify-between gap-3 cursor-pointer">
             <div class="min-w-0">
               <div class="flex flex-wrap items-center gap-1.5">
                 <span class="font-bold text-sm text-slate-800">${escapeHtml(item.startTitle)}</span>
                 <span class="text-[11px] font-bold bg-verdy-100 text-verdy-800 px-2 py-0.5 rounded-full">${item.clicks}クリック</span>
+                ${modePill}
                 ${item.excludeTokyo ? '<span class="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">「東京都」除外</span>' : ''}
               </div>
               <p class="text-xs text-slate-500 mt-1 truncate">${escapeHtml((item.route || []).join(' → '))}</p>
             </div>
             <span class="text-[11px] text-slate-400 shrink-0 font-mono mt-0.5">${escapeHtml(formatHistoryTime(item.timestamp))}</span>
-          </button>`
-        )
+          </button>`;
+        })
         .join('');
     }
 
@@ -2246,9 +2867,12 @@
     // =========================================================================
 
     function bindEvents() {
+      el.modeAssociationBtn.addEventListener('click', () => setSearchMode('association'));
+      el.modeShortestBtn.addEventListener('click', () => setSearchMode('shortest'));
+
       el.searchForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        runRouteSearch(el.startInput.value);
+        runSearch(el.startInput.value);
       });
 
       el.startInput.addEventListener('input', () => {
@@ -2275,7 +2899,7 @@
           el.startInput.value = chosen;
           updateClearBtnVisibility();
           closeSuggestions();
-          runRouteSearch(chosen);
+          runSearch(chosen);
         } else if (e.key === 'Escape') {
           closeSuggestions();
         }
@@ -2297,7 +2921,7 @@
           el.startInput.value = title;
           updateClearBtnVisibility();
           closeSuggestions();
-          runRouteSearch(title);
+          runSearch(title);
         }
       });
 
@@ -2314,7 +2938,7 @@
 
         // すでに結果が表示されていて検索中でなければ、新設定で自動再検索
         if (!state.isSearching && state.currentResult && state.currentResult.startTitle) {
-          runRouteSearch(state.currentResult.startTitle);
+          runSearch(state.currentResult.startTitle);
         }
       });
 
@@ -2328,7 +2952,7 @@
         const kw = btn.dataset.preset;
         el.startInput.value = kw;
         updateClearBtnVisibility();
-        runRouteSearch(kw);
+        runSearch(kw);
       });
 
       el.cancelBtn.addEventListener('click', () => {
@@ -2339,6 +2963,14 @@
 
       el.copyResultBtn.addEventListener('click', copyCurrentResult);
       el.shareXBtn.addEventListener('click', shareResultOnX);
+
+      el.retryAssociationBtn.addEventListener('click', () => {
+        if (state.isSearching || !state.currentResult?.startTitle) return;
+        runSearch(state.currentResult.startTitle, {
+          forceMode: 'association',
+          avoidPreviousFirstHop: true
+        });
+      });
 
       el.altRoutesButtons.addEventListener('click', (e) => {
         const btn = e.target.closest('button[data-route-idx]');
@@ -2359,11 +2991,15 @@
 
         el.startInput.value = item.startTitle;
         updateClearBtnVisibility();
+        if (item.mode && state.searchMode !== item.mode) {
+          state.searchMode = item.mode;
+          updateSearchModeUI();
+        }
         if (typeof item.excludeTokyo === 'boolean' && state.excludeTokyo !== item.excludeTokyo) {
           state.excludeTokyo = item.excludeTokyo;
           updateExcludeTokyoButtonUI();
         }
-        runRouteSearch(item.startTitle);
+        runSearch(item.startTitle);
       });
 
       el.clearHistoryBtn.addEventListener('click', () => {
@@ -2392,6 +3028,7 @@
     // 起動処理
     window.addEventListener('DOMContentLoaded', () => {
       initPresets();
+      updateSearchModeUI();
       updateExcludeTokyoButtonUI();
       loadHistory();
       bindEvents();
