@@ -4,491 +4,518 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>東京ヴェルディへの最短ルート検索</title>
+  <meta name="description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達する最短ルートをリアルタイム検索できるWebツールです。" />
 
-  <!-- 基本説明文・OGP / X(Twitter)カード設定（公開時は example.com の部分を実際の公開URLへ書き換えてください） -->
-  <meta name="description" content="どんな言葉からでもWikipediaのリンクをたどって「東京ヴェルディ」へ！最短クリック数とルートをリアルタイム検索できるWebツールです。" />
+  <!-- =========================================================================
+       OGP・X（旧Twitter）カード設定
+       公開時は下記の「https://example.com/」をご自身の公開URLに書き換えてください
+       ========================================================================= -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="東京ヴェルディへの最短ルート検索" />
   <meta property="og:title" content="東京ヴェルディへの最短ルート検索" />
-  <meta property="og:description" content="どんな言葉からでもWikipediaのリンクをたどって「東京ヴェルディ」へ！最短クリック数とルートをリアルタイム検索できるWebツールです。" />
-  <!-- ▼ 公開するサイトのURL（例: https://your-site.netlify.app/）に書き換えてください -->
+  <meta property="og:description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達する最短ルートを検索！" />
   <meta property="og:url" content="https://example.com/" />
-  <!-- ▼ OGP画像を用意した場合、アップロード先の絶対URLに差し替えてください -->
-  <meta property="og:image" content="https://example.com/ogp.png" />
-  <!-- ▼ OGP画像を用意して大きく表示したい場合は "summary_large_image" に変更してください -->
-  <meta name="twitter:card" content="summary" />
+  <!-- OGP画像を用意した場合はURLを設定してください（推奨: 1200x630px） -->
+  <!-- <meta property="og:image" content="https://example.com/ogp.png" /> -->
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="東京ヴェルディへの最短ルート検索" />
-  <meta name="twitter:description" content="どんな言葉からでもWikipediaのリンクをたどって「東京ヴェルディ」へ！最短クリック数とルートをリアルタイム検索できるWebツールです。" />
-  <!-- ▼ OGP画像を用意した場合、og:image と同じ画像URLに差し替えてください -->
-  <meta name="twitter:image" content="https://example.com/ogp.png" />
+  <meta name="twitter:description" content="どんな単語からでもWikipediaの本文リンクをたどって「東京ヴェルディ」へ到達する最短ルートを検索！" />
+  <!-- <meta name="twitter:image" content="https://example.com/ogp.png" /> -->
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & Noto Sans JP -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet" />
-
   <script>
-    // Tailwind カスタムカラー・フォント設定（東京ヴェルディのグリーン＆ゴールド基調）
     tailwind.config = {
       theme: {
         extend: {
           colors: {
             verdy: {
-              50: '#ecfdf4',
-              100: '#d1fae5',
-              200: '#a7f3d0',
-              500: '#00994d',
-              600: '#007d4b',
-              700: '#00693e',
-              800: '#005230',
-              900: '#003b22',
+              50: '#eef8f3',
+              100: '#d5eee1',
+              200: '#addcc5',
+              300: '#78c3a2',
+              400: '#42a37c',
+              500: '#1f855f',
+              600: '#00693e',
+              700: '#005230',
+              800: '#054229',
+              900: '#063623',
             },
             gold: {
-              100: '#faf4e6',
-              300: '#e2ca95',
+              400: '#d4b370',
               500: '#c5a059',
-              600: '#a8843e',
+              600: '#a88440',
             }
           },
           fontFamily: {
-            sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
+            sans: ['"Inter"', '"Noto Sans JP"', '"Hiragino Kaku Gothic ProN"', '"Meiryo"', 'sans-serif'],
           }
         }
       }
     };
   </script>
 
+  <!-- Google Fonts (Inter + Noto Sans JP) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet" />
+
   <style>
-    /* ベーススタイルとアニメーション定義 */
     body {
-      font-family: "Inter", "Noto Sans JP", sans-serif;
-      background-color: #f8fafc;
+      font-family: "Inter", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
     }
-
-    .pitch-bg {
-      background-color: #00693e;
-      background-image:
-        radial-gradient(circle at 85% 20%, rgba(197, 160, 89, 0.24) 0%, transparent 45%),
-        radial-gradient(circle at 15% 85%, rgba(0, 82, 48, 0.55) 0%, transparent 50%),
-        repeating-linear-gradient(
-          90deg,
-          rgba(255, 255, 255, 0.03) 0px,
-          rgba(255, 255, 255, 0.03) 40px,
-          transparent 40px,
-          transparent 80px
-        );
-    }
-
-    @keyframes pulseBar {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(250%); }
-    }
-
-    .animate-indeterminate {
-      animation: pulseBar 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    }
-
     @keyframes fadeSlideUp {
       from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(8px);
       }
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-
-    .fade-slide-up {
-      animation: fadeSlideUp 0.35s ease-out forwards;
+    .animate-fade-up {
+      animation: fadeSlideUp 0.28s ease-out forwards;
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
   </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-verdy-200 selection:text-verdy-900">
 
   <!-- ヘッダー -->
-  <header class="pitch-bg text-white shadow-lg relative overflow-hidden">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-7 sm:py-9 relative z-10">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div class="flex items-center gap-3.5">
-          <!-- エンブレム風サッカーボールSVGアイコン -->
-          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-gold-300/40 backdrop-blur-sm flex items-center justify-center shrink-0 shadow-inner">
-            <svg class="w-7 h-7 sm:w-8 sm:h-8 text-gold-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="9.5" />
-              <polygon points="12 7 16.2 10 14.6 15 9.4 15 7.8 10" fill="currentColor" fill-opacity="0.25" />
-              <path d="M12 2.5V7M21.1 9.1L16.2 10M17.6 19.6L14.6 15M6.4 19.6L9.4 15M2.9 9.1L7.8 10" />
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight leading-tight">
-              東京ヴェルディへの最短ルート検索
-            </h1>
-          </div>
-        </div>
-
-        <!-- ゴールキャッシュ状態バッジ -->
-        <div id="cacheStatusBadge" class="inline-flex items-center gap-2 self-start sm:self-center px-3.5 py-2 rounded-xl bg-black/20 border border-white/15 text-xs font-medium text-emerald-100 backdrop-blur-sm">
-          <span id="cacheStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
-          <span id="cacheStatusText">ゴール記事を準備中...</span>
-        </div>
+  <header class="bg-gradient-to-br from-verdy-700 via-verdy-600 to-verdy-800 text-white shadow-lg relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-gold-400 blur-3xl"></div>
+      <div class="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-verdy-300 blur-3xl"></div>
+    </div>
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-7 sm:py-9 relative z-10">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <span class="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide bg-white/15 backdrop-blur-sm text-verdy-50 px-3 py-1 rounded-full border border-white/20">
+          <span class="w-2 h-2 rounded-full bg-gold-400 animate-pulse" id="cacheStatusDot"></span>
+          <span id="cacheStatusText">ゴール情報を準備中...</span>
+        </span>
+        <span class="text-xs font-medium text-verdy-100/90 bg-black/15 px-2.5 py-1 rounded-full">
+          日本語版Wikipedia API連携
+        </span>
       </div>
-
-      <p class="mt-3.5 text-sm sm:text-base text-emerald-100/95 max-w-2xl leading-relaxed">
-        どんな言葉からでも、日本語版Wikipediaの内部リンクをたどって<strong>「東京ヴェルディ1969」</strong>へたどり着く最短ルートをリアルタイム検索します。
+      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-snug">
+        東京ヴェルディへの最短ルート検索
+      </h1>
+      <p class="mt-2 text-sm sm:text-base text-verdy-100 leading-relaxed">
+        好きな言葉を入力すると、Wikipediaの本文リンクをたどって<strong class="text-white font-bold underline decoration-gold-400 decoration-2 underline-offset-4">東京ヴェルディ</strong>へ到達する最短ルートをリアルタイム検索します。
       </p>
     </div>
   </header>
 
   <!-- メインコンテンツ -->
-  <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 -mt-4 pb-16 relative z-20 space-y-6">
+  <main class="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
 
     <!-- 検索フォームカード -->
-    <section class="bg-white rounded-2xl shadow-md border border-slate-200/80 p-5 sm:p-6">
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-6">
       <form id="searchForm" class="space-y-4" autocomplete="off">
-        <div class="flex flex-col sm:flex-row gap-3">
-          <!-- オートコンプリート付き入力欄 -->
-          <div class="relative flex-1">
-            <label for="startInput" class="sr-only">出発するWikipedia記事・キーワード</label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="M21 21l-4.35-4.35"></path>
-                </svg>
-              </span>
+        <div>
+          <label for="startInput" class="block text-sm font-bold text-slate-700 mb-2">
+            出発するWikipedia記事（キーワード）
+          </label>
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <div class="relative flex-1">
               <input
                 id="startInput"
                 type="text"
-                placeholder="好きな言葉を入力（例：ラーメン、ブラックホール、織田信長）"
-                class="w-full pl-11 pr-10 py-3.5 rounded-xl border border-slate-300 bg-slate-50/50 text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-verdy-600 focus:border-verdy-600 text-base transition"
+                placeholder="例：ラーメン、ピカチュウ、ブラックホール..."
+                class="w-full px-4 py-3.5 pr-10 rounded-xl border border-slate-300 bg-slate-50/60 focus:bg-white focus:border-verdy-600 focus:ring-4 focus:ring-verdy-600/15 outline-none text-base text-slate-900 placeholder:text-slate-400 transition"
+                aria-autocomplete="list"
+                aria-controls="suggestList"
               />
               <button
                 type="button"
                 id="clearInputBtn"
-                class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 rounded-lg transition"
                 aria-label="入力をクリア"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
+
+              <!-- サジェスト候補ドロップダウン -->
+              <ul
+                id="suggestList"
+                role="listbox"
+                class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-30 max-h-64 overflow-y-auto divide-y divide-slate-100"
+              ></ul>
             </div>
 
-            <!-- オートコンプリート候補リスト -->
-            <ul
-              id="suggestionsList"
-              class="hidden absolute z-30 left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden divide-y divide-slate-100 max-h-72 overflow-y-auto"
-              role="listbox"
-            ></ul>
-          </div>
-
-          <!-- 検索実行 / キャンセルボタン -->
-          <div class="flex gap-2 shrink-0">
             <button
               type="submit"
               id="searchBtn"
-              class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-verdy-700 hover:bg-verdy-600 active:bg-verdy-800 text-white font-bold text-base shadow-sm hover:shadow transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-verdy-600 hover:bg-verdy-700 active:scale-[0.99] text-white font-bold text-base shadow-sm shadow-verdy-700/20 transition cursor-pointer shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" />
               </svg>
-              <span>最短ルートを検索</span>
-            </button>
-
-            <button
-              type="button"
-              id="cancelBtn"
-              class="hidden inline-flex items-center justify-center gap-1.5 px-5 py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-base shadow-sm transition cursor-pointer"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              <span>キャンセル</span>
+              <span>ルートを検索</span>
             </button>
           </div>
         </div>
 
-        <!-- プリセット & ランダム記事ボタン -->
-        <div class="pt-1 flex flex-col gap-2.5">
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <span class="text-xs font-semibold text-slate-500 tracking-wider">ワンタップでお試し</span>
-            <button
-              type="button"
-              id="randomBtn"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gold-100 hover:bg-gold-300/50 text-amber-900 border border-gold-500/40 text-xs font-bold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span>ランダムな記事で試す</span>
-            </button>
-          </div>
-          <div id="presetContainer" class="flex flex-wrap gap-2">
-            <!-- JSで生成 -->
-          </div>
+        <!-- フィルタボタン & ランダムボタン行 -->
+        <div class="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+          <!-- 「東京都」を除外 トグルボタン（デフォルトON） -->
+          <button
+            type="button"
+            id="excludeTokyoBtn"
+            role="switch"
+            aria-checked="true"
+            class="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition cursor-pointer select-none"
+          >
+            <span id="excludeTokyoTrack" class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-verdy-600">
+              <span id="excludeTokyoKnob" class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform translate-x-4.5"></span>
+            </span>
+            <span>「東京都」を除外</span>
+          </button>
+
+          <button
+            type="button"
+            id="randomBtn"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 text-sm font-semibold transition cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-verdy-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>ランダムな記事で試す</span>
+          </button>
+        </div>
+
+        <!-- プリセットチップ -->
+        <div class="pt-1">
+          <div class="text-xs font-semibold text-slate-500 mb-2">人気のキーワードで試す：</div>
+          <div id="presetContainer" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- ルール注記 -->
+        <div class="flex items-start gap-2 rounded-xl bg-verdy-50/70 border border-verdy-100 px-3.5 py-2.5 text-xs text-verdy-900/90 leading-relaxed">
+          <svg class="w-4 h-4 text-verdy-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>
+            <strong>本文リンク限定ルール：</strong>記事内の脚注（出典・注釈）および下部の折りたたみ一覧表（ナビゲーションボックス／テンプレート）のリンクは常に除外して検索します。
+          </span>
         </div>
       </form>
     </section>
 
-    <!-- リアルタイム進捗パネル -->
-    <section id="progressPanel" class="hidden bg-white rounded-2xl shadow-md border border-verdy-200 p-5 sm:p-6 fade-slide-up">
-      <div class="flex items-center justify-between gap-3 mb-3">
-        <div class="flex items-center gap-2.5">
-          <span class="w-3 h-3 rounded-full bg-verdy-600 animate-ping shrink-0"></span>
-          <h2 id="progressPhase" class="font-bold text-slate-800 text-sm sm:text-base">検索を開始しています...</h2>
+    <!-- 進捗パネル（検索中に表示） -->
+    <section id="progressPanel" class="hidden bg-white rounded-2xl shadow-sm border border-verdy-200 p-5 animate-fade-up">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-verdy-50 border border-verdy-100 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-verdy-600 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle>
+              <path class="opacity-85" fill="currentColor" d="M4 12a8 8 0 018-8v3.5a4.5 4.5 0 00-4.5 4.5H4z"></path>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="progressPhase" class="text-xs font-bold text-verdy-700 bg-verdy-100 px-2.5 py-0.5 rounded-full">検索準備</span>
+              <span id="progressElapsed" class="text-xs font-mono text-slate-500">0.0秒</span>
+            </div>
+            <p id="progressText" class="text-sm font-semibold text-slate-800 mt-1 break-words">
+              Wikipediaからリンク情報を取得しています...
+            </p>
+          </div>
         </div>
-        <span id="progressElapsed" class="text-xs font-mono font-semibold text-verdy-700 bg-verdy-50 px-2.5 py-1 rounded-lg border border-verdy-200 shrink-0">0.0秒</span>
+        <button
+          type="button"
+          id="cancelBtn"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition shrink-0 cursor-pointer"
+        >
+          キャンセル
+        </button>
       </div>
 
-      <!-- インデターミネート・プログレスバー -->
-      <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden mb-4">
-        <div class="w-2/5 h-full bg-gradient-to-r from-verdy-700 via-verdy-500 to-gold-500 rounded-full animate-indeterminate"></div>
-      </div>
-
-      <!-- 検索メトリクス -->
-      <div class="grid grid-cols-3 gap-2.5 text-center">
-        <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
-          <div class="text-[11px] text-slate-500 font-medium">現在の検索ステップ</div>
-          <div id="metricDepth" class="text-base sm:text-lg font-extrabold text-verdy-700 mt-0.5">-</div>
+      <div class="grid grid-cols-2 gap-2.5 mt-4 pt-3.5 border-t border-slate-100 text-xs">
+        <div class="bg-slate-50 rounded-xl px-3 py-2 flex items-center justify-between">
+          <span class="text-slate-500">API通信回数</span>
+          <span id="metricApiCalls" class="font-bold text-slate-700 font-mono">0回</span>
         </div>
-        <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
-          <div class="text-[11px] text-slate-500 font-medium">APIリクエスト</div>
-          <div id="metricApiCalls" class="text-base sm:text-lg font-extrabold text-slate-800 mt-0.5">0回</div>
-        </div>
-        <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
-          <div class="text-[11px] text-slate-500 font-medium">確認した記事数</div>
-          <div id="metricScanned" class="text-base sm:text-lg font-extrabold text-slate-800 mt-0.5">0件</div>
+        <div class="bg-slate-50 rounded-xl px-3 py-2 flex items-center justify-between">
+          <span class="text-slate-500">照合リンク数</span>
+          <span id="metricScanned" class="font-bold text-slate-700 font-mono">0件</span>
         </div>
       </div>
     </section>
 
-    <!-- エラー・お知らせメッセージボックス -->
-    <section id="messagePanel" class="hidden rounded-2xl p-4 sm:p-5 border fade-slide-up" role="alert">
+    <!-- メッセージボックス（エラー・警告・通知用） -->
+    <section id="messageBox" class="hidden rounded-2xl border p-4 sm:p-5 animate-fade-up" role="alert">
       <div class="flex items-start gap-3">
         <div id="messageIcon" class="shrink-0 mt-0.5"></div>
-        <div class="flex-1 min-w-0">
-          <h3 id="messageTitle" class="font-bold text-sm sm:text-base"></h3>
-          <p id="messageBody" class="text-sm mt-1 leading-relaxed"></p>
+        <div class="min-w-0">
+          <h2 id="messageTitle" class="text-sm sm:text-base font-bold"></h2>
+          <p id="messageBody" class="text-xs sm:text-sm mt-1 leading-relaxed"></p>
         </div>
       </div>
     </section>
 
     <!-- 検索結果セクション -->
-    <section id="resultSection" class="hidden space-y-5 fade-slide-up">
+    <section id="resultSection" class="hidden space-y-4 animate-fade-up">
       <!-- 結果サマリーバナー -->
-      <div class="pitch-bg rounded-2xl p-5 sm:p-6 text-white shadow-lg border border-verdy-800 relative overflow-hidden">
-        <div class="flex flex-col gap-4 relative z-10">
-          <div class="space-y-1.5">
-            <div id="resultNote" class="hidden inline-flex items-center gap-1.5 text-xs bg-white/15 text-emerald-100 px-2.5 py-1 rounded-lg"></div>
-            <h2 id="resultHeadline" class="text-xl sm:text-2xl font-extrabold leading-snug tracking-tight">
-              <!-- JSで挿入 -->
-            </h2>
-            <p id="resultMeta" class="text-xs sm:text-sm text-emerald-100/90 font-medium">
-              <!-- 検索時間・API数など -->
-            </p>
-          </div>
-
-          <!-- アクションボタン（横並び・スマホでは折り返し） -->
-          <div class="flex flex-wrap items-center gap-2.5">
-            <button
-              type="button"
-              id="copyResultBtn"
-              class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-900 border border-slate-200 font-bold text-sm shadow transition cursor-pointer"
-            >
-              <svg class="w-4 h-4 shrink-0 text-verdy-700" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
-              </svg>
-              <span id="copyBtnLabel">結果をコピー</span>
-            </button>
-
-            <button
-              type="button"
-              id="shareXBtn"
-              class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0f1419] hover:bg-[#272c30] active:bg-black text-white border border-white/20 font-bold text-sm shadow transition cursor-pointer"
-            >
-              <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-              <span>結果をX(旧Twitter)にシェアする</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ルートステップ表示 -->
-      <div class="bg-white rounded-2xl shadow-md border border-slate-200/80 p-5 sm:p-6">
-        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
-          <h3 class="font-bold text-slate-800 text-base sm:text-lg flex items-center gap-2">
-            <span class="w-1.5 h-5 rounded-full bg-verdy-600 inline-block"></span>
-            最短リンク経路
-          </h3>
-          <span class="text-xs text-slate-500">各カードから実際のWikipedia記事を開けます</span>
-        </div>
-
-        <div id="pathChainContainer" class="space-y-0">
-          <!-- JSでカードと矢印をレンダリング -->
-        </div>
-
-        <!-- 別ルート候補 -->
-        <div id="altRoutesBox" class="hidden mt-6 pt-5 border-t border-slate-100">
-          <h4 class="text-xs font-bold text-slate-500 tracking-wider mb-2.5 flex items-center gap-1.5">
-            <svg class="w-4 h-4 text-verdy-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+      <div class="bg-gradient-to-br from-verdy-700 via-verdy-600 to-verdy-800 text-white rounded-2xl shadow-md p-5 sm:p-6">
+        <div class="flex flex-wrap items-center gap-2 mb-2.5">
+          <span class="inline-flex items-center gap-1.5 bg-gold-500 text-verdy-950 font-extrabold text-xs sm:text-sm px-3 py-1 rounded-full shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
-            同じクリック数の別ルート候補（タップで切り替え）
-          </h4>
-          <div id="altRoutesList" class="flex flex-wrap gap-2"></div>
+            <span id="resultClicksBadge">0クリックで到達！</span>
+          </span>
+          <span id="resultExcludeBadge" class="hidden inline-flex items-center gap-1 bg-white/15 border border-white/25 text-verdy-50 text-xs font-semibold px-2.5 py-1 rounded-full">
+            「東京都」除外モード
+          </span>
+          <span class="inline-flex items-center gap-1 bg-black/20 text-verdy-100 text-xs font-medium px-2.5 py-1 rounded-full">
+            本文リンク限定
+          </span>
+        </div>
+
+        <h2 id="resultHeadline" class="text-lg sm:text-xl font-extrabold leading-snug break-words"></h2>
+        <p id="resultSubnote" class="hidden text-xs sm:text-sm text-verdy-100/90 mt-1.5"></p>
+        <p id="resultPathSummary" class="mt-3 text-sm font-semibold text-verdy-50 bg-black/15 rounded-xl px-3.5 py-2.5 leading-relaxed break-words"></p>
+
+        <!-- アクションボタン（白色コピーボタン & 黒色Xシェアボタン） -->
+        <div class="mt-4 flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            id="copyResultBtn"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 active:scale-[0.99] text-slate-800 font-bold text-sm shadow-sm transition cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-verdy-700" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <span id="copyResultBtnLabel">結果をコピー</span>
+          </button>
+
+          <button
+            type="button"
+            id="shareXBtn"
+            style="background-color: #0f1419;"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:opacity-90 active:scale-[0.99] text-white font-bold text-sm shadow-sm border border-white/15 transition cursor-pointer"
+          >
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            <span>結果をX(旧Twitter)にシェアする</span>
+          </button>
         </div>
       </div>
+
+      <!-- 別ルート切り替えタブ（複数候補がある場合） -->
+      <div id="altRoutesBar" class="hidden bg-white rounded-2xl border border-slate-200/80 p-3.5 flex flex-wrap items-center gap-2">
+        <span class="text-xs font-bold text-slate-500 mr-1">同じクリック数の別ルート：</span>
+        <div id="altRoutesButtons" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- ルート詳細カード一覧 -->
+      <div id="routeCardsContainer" class="space-y-2"></div>
     </section>
 
     <!-- 検索履歴セクション -->
-    <section id="historySection" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6">
-      <div class="flex items-center justify-between mb-3.5">
-        <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
-          <svg class="w-4 h-4 text-verdy-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
+    <section id="historySection" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-6">
+      <div class="flex items-center justify-between gap-2 mb-3">
+        <h2 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-verdy-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          検索履歴
-        </h3>
+          <span>最近の検索履歴</span>
+        </h2>
         <button
           type="button"
           id="clearHistoryBtn"
-          class="hidden text-xs text-slate-400 hover:text-rose-600 font-medium transition cursor-pointer"
+          class="text-xs font-semibold text-slate-400 hover:text-rose-600 px-2 py-1 rounded-lg hover:bg-rose-50 transition cursor-pointer"
         >
           履歴をクリア
         </button>
       </div>
-      <div id="historyList" class="space-y-2 text-sm text-slate-500">
-        <p class="text-xs text-slate-400 py-2">まだ検索履歴がありません。上の検索欄やプリセットから試してみてください。</p>
-      </div>
+      <div id="historyList" class="divide-y divide-slate-100"></div>
     </section>
 
-    <!-- アルゴリズム解説フッターカード -->
-    <section class="bg-verdy-50/70 rounded-2xl border border-verdy-100 p-4 sm:p-5 text-xs sm:text-sm text-slate-600 leading-relaxed">
-      <div class="font-bold text-verdy-800 mb-1 flex items-center gap-1.5">
-        <svg class="w-4 h-4 text-verdy-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        検索の仕組み
-      </div>
-      <p>
-        日本語版Wikipediaの公式APIへ直接アクセスし、<strong>出発記事からの発リンク</strong>と<strong>「東京ヴェルディ1969」への被リンク（逆引き）</strong>を両側から照合する双方向幅優先検索を行っています。すべての経路は実際のWikipediaリンクに基づいています。
-      </p>
+    <!-- 検索の仕組み（折りたたみ） -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+      <details class="group">
+        <summary class="flex items-center justify-between gap-2 px-4 sm:px-6 py-4 cursor-pointer list-none select-none hover:bg-slate-50 transition">
+          <span class="text-sm font-bold text-slate-700 flex items-center gap-2">
+            <svg class="w-4 h-4 text-verdy-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <span>検索の仕組み・ルールについて</span>
+          </span>
+          <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="px-4 sm:px-6 pb-5 pt-1 text-xs sm:text-sm text-slate-600 space-y-2.5 leading-relaxed border-t border-slate-100">
+          <p>
+            <strong>1. 双方向リアルタイム検索：</strong>
+            起動時に「東京ヴェルディ1969」への被リンクと主要ハブ記事をキャッシュし、入力された出発記事からの発リンクと両側から照合することで、最大4クリック以内の最短ルートをブラウザ上だけで検索します。
+          </p>
+          <p>
+            <strong>2. 本文リンク限定（脚注・折りたたみ一覧表を常時除外）：</strong>
+            WikipediaのHTML構造を解析し、「脚注」「注釈」「出典」「参考文献」セクションや、記事下部の折りたたみ一覧表（ナビゲーションボックス／テンプレート）に含まれるリンクはすべて除外した上で、本文中のリンクだけでつながる経路を検証しています。
+          </p>
+          <p>
+            <strong>3. 「「東京都」を除外」モード：</strong>
+            デフォルトでONになっており、中継地点として「東京都」を経由しない、より意外性のあるルートを検索します。オフにすると「東京都」経由も含めた最短ルートを検索できます。
+          </p>
+        </div>
+      </details>
     </section>
   </main>
+
+  <!-- フッター -->
+  <footer class="mt-auto py-6 text-center text-xs text-slate-400 px-4">
+    <p>
+      データ提供：<a href="https://ja.wikipedia.org/" target="_blank" rel="noopener noreferrer" class="underline hover:text-verdy-600 transition">日本語版Wikipedia</a>（CC BY-SA 4.0）
+    </p>
+  </footer>
 
   <!-- トースト通知 -->
   <div
     id="toast"
-    class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold shadow-xl opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2"
+    class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden items-center gap-2 bg-slate-900 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-full shadow-lg"
+    role="status"
+    aria-live="polite"
   >
-    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-    </svg>
-    <span id="toastText">コピーしました！</span>
+    <span id="toastText"></span>
   </div>
 
   <script>
-    /**
-     * 東京ヴェルディへの最短ルート検索
-     * 日本語版Wikipedia MediaWiki API を使用したリアルタイム双方向幅優先検索エンジン
-     */
+    // =========================================================================
+    // 設定・定数
+    // =========================================================================
 
-    // =========================================================================
-    // 公開設定（必要に応じてここを編集してください）
-    // 公開URLを固定したい場合は 'https://your-site.netlify.app/' のように記入します。
-    // 空欄（''）のままでも、https:// または http:// の本番公開サイトで開いた場合は
-    // 現在のURL（origin + pathname）を自動取得してXシェアやコピーに利用します。
-    // =========================================================================
+    // 公開URLを固定したい場合はここに設定（空欄でも公開サーバー上では自動取得します）
     const PUBLIC_URL = '';
 
     const WIKI_API = 'https://ja.wikipedia.org/w/api.php';
-    const GOAL_QUERY = '東京ヴェルディ1969';
-    const PRESET_WORDS = [
+    const GOAL_QUERY_TITLE = '東京ヴェルディ1969';
+    const HISTORY_STORAGE_KEY = 'tokyo_verdy_wiki_route_history_v2';
+
+    const PRESET_KEYWORDS = [
       'ラーメン',
+      'ピカチュウ',
       'ブラックホール',
       '織田信長',
-      'ピカチュウ',
-      'バナナ',
-      '相対性理論'
+      'カレーライス',
+      '相対性理論',
+      '富士山',
+      'モーツァルト'
     ];
 
-    // 日本語版Wikipediaの主要ハブ記事候補（ゴールへの直接リンク有無を起動時にAPI検証する）
+    // 「「東京都」を除外」ON時に中継から除外するタイトル
+    const EXCLUDED_TOKYO_TITLES = new Set(['東京都', '東京']);
+
+    // 日本語版Wikipediaの主要ハブ記事候補（ゴールへの直接リンク有無を起動時にAPI検証する・50件以内）
     const SUPER_HUB_CANDIDATES = [
       '東京都', '日本プロサッカーリーグ', 'Jリーグ', 'サッカー', '日本テレビ放送網',
       '読売新聞', '読売新聞社', '味の素スタジアム', '日本', '川崎市', '稲城市', '調布市',
       '日本のサッカー', 'プロサッカー選手', '関東地方', 'スポーツ', '東京', '1969年',
       '1993年', '読売巨人軍', 'サッカー日本代表', '多摩地域', 'テレビ', '映画',
       'アニメ', '音楽', '歴史', '世界', 'オリンピック', 'アメリカ合衆国', 'ブラジル',
-      'ヨーロッパ', 'アジア', 'J1リーグ', 'J2リーグ'
+      'ヨーロッパ', 'アジア', 'J1リーグ', 'J2リーグ', '神奈川県', '日本サッカー協会',
+      '天皇杯 JFA 全日本サッカー選手権大会', 'Jリーグカップ', '国立競技場',
+      '三浦知良', 'ラモス瑠偉', '北澤豪', '読売新聞グループ本社', '日テレ・東京ヴェルディベレーザ'
     ];
 
-    // 2ホップ先以降で優先展開する汎用ハブキーワード（日本語Wikipediaで特に接続数が多い記事）
+    // 3〜4クリック検索で優先的に展開したい中継ハブ記事
     const PRIORITY_BRIDGE_HUBS = new Set([
-      '日本', '東京都', '東京', 'アメリカ合衆国', 'ヨーロッパ', 'アジア', '関東地方',
-      '歴史', '世界', 'テレビ', '映画', 'スポーツ', 'サッカー', 'Jリーグ', '音楽',
-      'アニメ', '科学', '経済', '文化', '教育', '政治', '企業', '大学', '新聞',
-      '神奈川県', '大阪府', '埼玉県', '千葉県', '北海道', '愛知県', '福岡県',
-      '20世紀', '21世紀', '昭和', '平成', '令和', 'オリンピック', 'ブラジル',
-      'イギリス', 'フランス', 'ドイツ', 'イタリア', '中国', '韓国', 'NHK',
-      '日本テレビ放送網', '読売新聞', '朝日新聞', '毎日新聞', 'フジテレビジョン',
-      'TBSテレビ', 'テレビ朝日', 'テレビ東京', '日本プロサッカーリーグ', '味の素スタジアム'
+      '日本', 'スポーツ', 'サッカー', '日本テレビ放送網', '読売新聞', '読売新聞社',
+      'テレビ', '映画', 'アニメ', '音楽', '関東地方', '神奈川県', '川崎市', '調布市',
+      'オリンピック', 'アメリカ合衆国', 'ブラジル', 'ヨーロッパ', 'アジア', '歴史',
+      '1993年', '1969年', '20世紀', '21世紀', '平成', '昭和', '読売巨人軍',
+      'NHK', 'フジテレビジョン', 'TBSテレビ', 'テレビ朝日', 'テレビ東京',
+      '東京都', '東京', 'プロ野球', 'Jリーグ', '日本プロサッカーリーグ'
     ]);
 
-    // アプリケーション状態
+    // 本文解析時に丸ごと除外するセクション見出し（脚注・出典系）
+    const EXCLUDED_SECTION_HEADINGS = new Set([
+      '脚注', '注釈', '出典', '参考文献', '参照', '註', '注', '典拠', '脚注・出典', '注釈・出典'
+    ]);
+
+    // =========================================================================
+    // アプリ状態管理
+    // =========================================================================
     const state = {
-      canonicalGoal: '東京ヴェルディ1969',
-      goalAliases: new Set(['東京ヴェルディ', '東京ヴェルディ1969']),
-      goalBacklinks: new Set(), // 1クリックでゴールへ到達できる記事群
-      verifiedDirectHubs: new Set(), // 主要ハブのうち実際にゴールへ直接リンクしている記事
-      isCacheReady: false,
+      canonicalGoal: GOAL_QUERY_TITLE,
+      goalAliases: new Set(['東京ヴェルディ1969', '東京ヴェルディ', 'ヴェルディ川崎', '読売サッカークラブ']),
+      goalBacklinks: new Set(),          // 1クリックでゴールへ到達できる候補記事群
+      verifiedDirectHubs: new Set(),     // 主要ハブのうちゴールへリンクしている記事
+      outgoingLinksCache: new Map(),     // articleTitle -> string[]（発リンク取得結果キャッシュ）
+      cleanLinksCache: new Map(),        // articleTitle -> Set<string>（脚注・一覧表除外済みの本文リンク）
+      verifiedGoalSources: new Set(),    // 本文リンクから直接ゴールへ到達できると検証済みの記事
+      rejectedGoalSources: new Set(),    // ゴールへのリンクが脚注・一覧表のみと判明した記事
+      articleInfoCache: new Map(),       // articleTitle -> { title, extract, thumbnail, url }
+      cacheReady: false,
       cachePromise: null,
       isSearching: false,
       abortController: null,
-      currentResult: null, // { start, path, altPaths, elapsedSec, apiCalls, scannedCount, note, summaries }
+      excludeTokyo: true,                // デフォルトON
+      searchStartTime: 0,
+      elapsedTimer: null,
+      apiCalls: 0,
+      scannedCount: 0,
+      currentResult: null,               // { startTitle, note, excludeTokyo, routes: string[][], selectedIndex: number }
       history: [],
-      acTimer: null,
-      acIndex: -1,
-      acItems: []
+      suggestTimer: null,
+      suggestActiveIndex: -1,
+      suggestItems: []
     };
 
-    // DOM要素キャッシュ
+    let copyLabelTimer = null;
+    let toastTimer = null;
+
+    // =========================================================================
+    // DOM参照
+    // =========================================================================
     const el = {
-      cacheStatusBadge: document.getElementById('cacheStatusBadge'),
       cacheStatusDot: document.getElementById('cacheStatusDot'),
       cacheStatusText: document.getElementById('cacheStatusText'),
       searchForm: document.getElementById('searchForm'),
       startInput: document.getElementById('startInput'),
       clearInputBtn: document.getElementById('clearInputBtn'),
-      suggestionsList: document.getElementById('suggestionsList'),
+      suggestList: document.getElementById('suggestList'),
       searchBtn: document.getElementById('searchBtn'),
-      cancelBtn: document.getElementById('cancelBtn'),
+      excludeTokyoBtn: document.getElementById('excludeTokyoBtn'),
+      excludeTokyoTrack: document.getElementById('excludeTokyoTrack'),
+      excludeTokyoKnob: document.getElementById('excludeTokyoKnob'),
       randomBtn: document.getElementById('randomBtn'),
       presetContainer: document.getElementById('presetContainer'),
       progressPanel: document.getElementById('progressPanel'),
       progressPhase: document.getElementById('progressPhase'),
       progressElapsed: document.getElementById('progressElapsed'),
-      metricDepth: document.getElementById('metricDepth'),
+      progressText: document.getElementById('progressText'),
       metricApiCalls: document.getElementById('metricApiCalls'),
       metricScanned: document.getElementById('metricScanned'),
-      messagePanel: document.getElementById('messagePanel'),
+      cancelBtn: document.getElementById('cancelBtn'),
+      messageBox: document.getElementById('messageBox'),
       messageIcon: document.getElementById('messageIcon'),
       messageTitle: document.getElementById('messageTitle'),
       messageBody: document.getElementById('messageBody'),
       resultSection: document.getElementById('resultSection'),
-      resultNote: document.getElementById('resultNote'),
+      resultClicksBadge: document.getElementById('resultClicksBadge'),
+      resultExcludeBadge: document.getElementById('resultExcludeBadge'),
       resultHeadline: document.getElementById('resultHeadline'),
-      resultMeta: document.getElementById('resultMeta'),
+      resultSubnote: document.getElementById('resultSubnote'),
+      resultPathSummary: document.getElementById('resultPathSummary'),
       copyResultBtn: document.getElementById('copyResultBtn'),
-      copyBtnLabel: document.getElementById('copyBtnLabel'),
+      copyResultBtnLabel: document.getElementById('copyResultBtnLabel'),
       shareXBtn: document.getElementById('shareXBtn'),
-      pathChainContainer: document.getElementById('pathChainContainer'),
-      altRoutesBox: document.getElementById('altRoutesBox'),
-      altRoutesList: document.getElementById('altRoutesList'),
+      altRoutesBar: document.getElementById('altRoutesBar'),
+      altRoutesButtons: document.getElementById('altRoutesButtons'),
+      routeCardsContainer: document.getElementById('routeCardsContainer'),
+      historySection: document.getElementById('historySection'),
       historyList: document.getElementById('historyList'),
       clearHistoryBtn: document.getElementById('clearHistoryBtn'),
       toast: document.getElementById('toast'),
@@ -496,1150 +523,11 @@
     };
 
     // =========================================================================
-    // ユーティリティ関数
+    // 共通ユーティリティ
     // =========================================================================
-
-    /**
-     * シェア・コピー用の公開URLを取得
-     * PUBLIC_URL が設定されていればそれを優先し、空欄の場合は本番公開環境（http/https）から自動取得する。
-     * file:// やプレビュー環境・srcdoc・localhost などでは空文字を返し、URLなしでも動作させる。
-     */
-    function getPublicUrl() {
-      const configured = (PUBLIC_URL || '').trim();
-      if (configured) {
-        return configured;
-      }
-
-      try {
-        const { protocol, hostname, origin, pathname } = window.location;
-        const isHttp = protocol === 'https:' || protocol === 'http:';
-        const isPreviewOrLocal =
-          !origin ||
-          origin === 'null' ||
-          pathname === 'srcdoc' ||
-          hostname === 'localhost' ||
-          hostname === '127.0.0.1' ||
-          hostname.endsWith('.googleusercontent.com') ||
-          hostname.includes('webcontainer') ||
-          hostname.includes('stackblitz');
-
-        if (isHttp && !isPreviewOrLocal) {
-          return origin + pathname;
-        }
-      } catch (e) {
-        // 制限された環境ではURLなしでフォールバック
-      }
-      return '';
-    }
-
-    /**
-     * 日本語版Wikipedia MediaWiki API への共通フェッチ関数
-     */
-    async function wikiFetch(params, signal, metrics) {
-      const url = new URL(WIKI_API);
-      url.searchParams.set('format', 'json');
-      url.searchParams.set('origin', '*');
-
-      for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null) {
-          url.searchParams.set(key, String(value));
-        }
-      }
-
-      if (metrics) {
-        metrics.apiCalls += 1;
-        updateProgressUI(metrics);
-      }
-
-      const res = await fetch(url.toString(), { signal });
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-      const data = await res.json();
-      if (data.error) {
-        throw new Error(data.error.info || data.error.code || 'Wikipedia API Error');
-      }
-      return data;
-    }
-
-    /**
-     * トースト通知を表示
-     */
-    let toastTimer = null;
-    function showToast(message) {
-      el.toastText.textContent = message;
-      el.toast.classList.remove('opacity-0');
-      el.toast.classList.add('opacity-100');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        el.toast.classList.remove('opacity-100');
-        el.toast.classList.add('opacity-0');
-      }, 2400);
-    }
-
-    /**
-     * エラー・警告・案内メッセージボックスを表示
-     */
-    function showMessage(type, title, body) {
-      const styles = {
-        error: {
-          panel: 'bg-rose-50 border-rose-200 text-rose-900',
-          icon: `<svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`
-        },
-        warning: {
-          panel: 'bg-amber-50 border-amber-200 text-amber-900',
-          icon: `<svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`
-        },
-        info: {
-          panel: 'bg-sky-50 border-sky-200 text-sky-900',
-          icon: `<svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`
-        }
-      };
-
-      const style = styles[type] || styles.info;
-      el.messagePanel.className = `rounded-2xl p-4 sm:p-5 border fade-slide-up ${style.panel}`;
-      el.messageIcon.innerHTML = style.icon;
-      el.messageTitle.textContent = title;
-      el.messageBody.textContent = body;
-      el.messagePanel.classList.remove('hidden');
-    }
-
-    /**
-     * メッセージボックスを非表示にする
-     */
-    function hideMessage() {
-      el.messagePanel.classList.add('hidden');
-    }
-
-    /**
-     * 日付・年号・一覧系など中継記事として優先度を下げたいタイトルを判定
-     */
-    function isDateOrListTitle(title) {
-      return (
-        /^\d+年$/.test(title) ||
-        /^\d+月\d+日$/.test(title) ||
-        /^\d+年代$/.test(title) ||
-        /^\d+世紀$/.test(title) ||
-        title.includes('一覧') ||
-        title.includes('曖昧さ回避')
-      );
-    }
-
-    /**
-     * 中継ノードの優先度スコアを計算（ハブや意味のある記事を優先）
-     */
-    function scoreIntermediateNode(title) {
-      let score = 0;
-      if (state.verifiedDirectHubs.has(title)) score += 100;
-      if (PRIORITY_BRIDGE_HUBS.has(title)) score += 60;
-      if (title.includes('サッカー') || title.includes('Jリーグ') || title.includes('東京') || title.includes('読売') || title.includes('日本テレビ')) score += 45;
-      if (title.includes('日本') || title.includes('都') || title.includes('県') || title.includes('市')) score += 20;
-      if (isDateOrListTitle(title)) score -= 30;
-      if (title.length >= 2 && title.length <= 10) score += 10;
-      return score;
-    }
-
-    /**
-     * 配列を指定サイズのチャンクに分割
-     */
-    function chunkArray(arr, size) {
-      const chunks = [];
-      for (let i = 0; i < arr.length; i += size) {
-        chunks.push(arr.slice(i, i + size));
-      }
-      return chunks;
-    }
-
-    /**
-     * タイムスタンプを短い日時表記に整形
-     */
-    function formatTimestamp(ts) {
-      if (!ts) return '';
-      try {
-        const d = new Date(ts);
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        const hh = String(d.getHours()).padStart(2, '0');
-        const mi = String(d.getMinutes()).padStart(2, '0');
-        return `${mm}/${dd} ${hh}:${mi}`;
-      } catch (e) {
-        return '';
-      }
-    }
-
-    // =========================================================================
-    // ゴール記事の解決 & 被リンクの事前キャッシュ
-    // =========================================================================
-
-    async function initGoalCache() {
-      if (state.isCacheReady) return;
-      if (state.cachePromise) return state.cachePromise;
-
-      state.cachePromise = (async () => {
-        try {
-          el.cacheStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0';
-          el.cacheStatusText.textContent = 'ゴール記事を解決中...';
-
-          // 1. 「東京ヴェルディ1969」の正規記事タイトルを取得
-          const res = await wikiFetch({
-            action: 'query',
-            titles: GOAL_QUERY,
-            redirects: 1
-          });
-
-          const pages = res.query?.pages || {};
-          const pageObj = Object.values(pages)[0];
-          if (pageObj && pageObj.title) {
-            state.canonicalGoal = pageObj.title;
-            state.goalAliases.add(pageObj.title);
-          }
-
-          // 2. 被リンクを5バッチ（最大約2,500件 + リダイレクト経由）取得
-          el.cacheStatusText.textContent = '被リンクをキャッシュ中...';
-          let blcontinue = undefined;
-          const MAX_BATCHES = 5;
-
-          for (let i = 0; i < MAX_BATCHES; i++) {
-            const blData = await wikiFetch({
-              action: 'query',
-              list: 'backlinks',
-              bltitle: state.canonicalGoal,
-              blnamespace: 0,
-              bllimit: 500,
-              blredirect: 1,
-              blcontinue
-            });
-
-            const list = blData.query?.backlinks || [];
-            for (const item of list) {
-              if (item.redirect === undefined) {
-                state.goalBacklinks.add(item.title);
-              } else {
-                // リダイレクト自体もゴール別名として登録し、そこへのリンク元も1クリック到達可能とみなす
-                state.goalAliases.add(item.title);
-                if (Array.isArray(item.redirlinks)) {
-                  for (const r of item.redirlinks) {
-                    if (r.ns === 0) {
-                      state.goalBacklinks.add(r.title);
-                    }
-                  }
-                }
-              }
-            }
-
-            blcontinue = blData.continue?.blcontinue;
-            if (!blcontinue) break;
-          }
-
-          // 3. 主要ハブ記事からゴールへの直接リンクを pltitles で一括検証
-          const targetFilter = Array.from(state.goalAliases).slice(0, 10).join('|');
-          const hubVerifyData = await wikiFetch({
-            action: 'query',
-            titles: SUPER_HUB_CANDIDATES.join('|'),
-            prop: 'links',
-            pltitles: targetFilter,
-            pllimit: 500,
-            redirects: 1
-          });
-
-          const hubPages = hubVerifyData.query?.pages || {};
-          for (const p of Object.values(hubPages)) {
-            if (p.links && p.links.length > 0) {
-              state.goalBacklinks.add(p.title);
-              state.verifiedDirectHubs.add(p.title);
-            }
-          }
-
-          state.isCacheReady = true;
-          el.cacheStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0';
-          el.cacheStatusText.textContent = `準備完了（被リンク ${state.goalBacklinks.size.toLocaleString()}件 取得済）`;
-        } catch (err) {
-          console.error('Goal cache init error:', err);
-          el.cacheStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0';
-          el.cacheStatusText.textContent = '初期キャッシュ一部失敗（検索時に再試行）';
-          state.cachePromise = null;
-        }
-      })();
-
-      return state.cachePromise;
-    }
-
-    // =========================================================================
-    // Wikipedia 記事解決・リンク取得ヘルパー
-    // =========================================================================
-
-    /**
-     * 入力キーワードを正規の日本語Wikipedia記事タイトルへ解決
-     * 完全一致がない場合は list=search にフォールバック
-     */
-    async function resolveStartArticle(rawQuery, signal, metrics) {
-      const trimmed = rawQuery.trim();
-      const data = await wikiFetch({
-        action: 'query',
-        titles: trimmed,
-        redirects: 1
-      }, signal, metrics);
-
-      const pages = data.query?.pages || {};
-      const page = Object.values(pages)[0];
-
-      if (page && page.missing === undefined && page.invalid === undefined) {
-        const redirectedFrom = data.query?.redirects?.[0]?.from;
-        return {
-          title: page.title,
-          note: redirectedFrom && redirectedFrom !== page.title
-            ? `「${redirectedFrom}」は「${page.title}」へリダイレクトされました`
-            : null
-        };
-      }
-
-      // フォールバック検索
-      const searchData = await wikiFetch({
-        action: 'query',
-        list: 'search',
-        srsearch: trimmed,
-        srnamespace: 0,
-        srlimit: 3
-      }, signal, metrics);
-
-      const hits = searchData.query?.search || [];
-      if (hits.length === 0) {
-        return null;
-      }
-
-      return {
-        title: hits[0].title,
-        note: `「${trimmed}」に完全一致する記事がないため、最も近い「${hits[0].title}」で検索しました`
-      };
-    }
-
-    /**
-     * 単一記事からの発リンクを取得（最大2ページ = 最大1,000リンク）
-     */
-    async function fetchOutgoingLinksSingle(title, signal, metrics, maxPages = 2) {
-      const links = new Set();
-      let plcontinue = undefined;
-
-      for (let i = 0; i < maxPages; i++) {
-        const data = await wikiFetch({
-          action: 'query',
-          titles: title,
-          prop: 'links',
-          plnamespace: 0,
-          pllimit: 500,
-          plcontinue
-        }, signal, metrics);
-
-        const pages = data.query?.pages || {};
-        for (const p of Object.values(pages)) {
-          if (Array.isArray(p.links)) {
-            for (const l of p.links) {
-              if (l.title !== title) {
-                links.add(l.title);
-              }
-            }
-          }
-        }
-
-        plcontinue = data.continue?.plcontinue;
-        if (!plcontinue) break;
-      }
-
-      metrics.scannedCount += links.size;
-      updateProgressUI(metrics);
-      return Array.from(links);
-    }
-
-    /**
-     * 指定した複数記事の中に「ゴールへ直接リンクしている記事」があるかを一括検証（pltitles）
-     * 最大50件/リクエストのため高速かつ正確
-     */
-    async function checkDirectLinksToGoal(candidateTitles, signal, metrics) {
-      const hits = [];
-      const targetFilter = Array.from(state.goalAliases).slice(0, 10).join('|');
-      const chunks = chunkArray(candidateTitles, 50);
-
-      // 並列で最大3リクエストずつ実行
-      for (let i = 0; i < chunks.length; i += 3) {
-        const group = chunks.slice(i, i + 3);
-        const results = await Promise.all(
-          group.map((batch) =>
-            wikiFetch({
-              action: 'query',
-              titles: batch.join('|'),
-              prop: 'links',
-              pltitles: targetFilter,
-              pllimit: 500
-            }, signal, metrics)
-          )
-        );
-
-        for (const data of results) {
-          const pages = data.query?.pages || {};
-          for (const p of Object.values(pages)) {
-            if (Array.isArray(p.links) && p.links.length > 0) {
-              hits.push(p.title);
-              state.goalBacklinks.add(p.title); // 次回以降のためにキャッシュにも追加
-            }
-          }
-        }
-      }
-
-      return hits;
-    }
-
-    /**
-     * 複数記事の発リンクをバッチ並列取得（5記事ずつ × 最大4並列）
-     * Map<sourceTitle, string[]> を返す
-     */
-    async function fetchOutgoingLinksBatch(titles, signal, metrics) {
-      const linkMap = new Map();
-      const chunks = chunkArray(titles, 5);
-
-      for (let i = 0; i < chunks.length; i += 4) {
-        const group = chunks.slice(i, i + 4);
-        const results = await Promise.all(
-          group.map((batch) =>
-            wikiFetch({
-              action: 'query',
-              titles: batch.join('|'),
-              prop: 'links',
-              plnamespace: 0,
-              pllimit: 500
-            }, signal, metrics)
-          )
-        );
-
-        for (const data of results) {
-          const pages = data.query?.pages || {};
-          for (const p of Object.values(pages)) {
-            if (!p.title || !Array.isArray(p.links)) continue;
-            const arr = linkMap.get(p.title) || [];
-            for (const l of p.links) {
-              if (l.title !== p.title) {
-                arr.push(l.title);
-              }
-            }
-            linkMap.set(p.title, arr);
-            metrics.scannedCount += p.links.length;
-          }
-        }
-        updateProgressUI(metrics);
-      }
-
-      return linkMap;
-    }
-
-    /**
-     * 結果経路に含まれる各記事の概要文とサムネイルを一括取得
-     */
-    async function fetchArticleSummaries(titles, signal) {
-      const data = await wikiFetch({
-        action: 'query',
-        titles: titles.join('|'),
-        prop: 'extracts|pageimages',
-        exintro: 1,
-        explaintext: 1,
-        exsentences: 2,
-        pithumbsize: 160,
-        redirects: 1
-      }, signal);
-
-      const map = new Map();
-      const pages = data.query?.pages || {};
-      for (const p of Object.values(pages)) {
-        if (p.title) {
-          map.set(p.title, {
-            title: p.title,
-            extract: p.extract || '記事の概要を取得できませんでした。',
-            thumbnail: p.thumbnail?.source || null
-          });
-        }
-      }
-      return map;
-    }
-
-    // =========================================================================
-    // メイン検索エンジン（双方向幅優先検索: 0〜4クリック）
-    // =========================================================================
-
-    async function findShortestPathToVerdy(rawInput) {
-      if (state.isSearching) return;
-
-      // 初期化が未完了なら待機
-      if (!state.isCacheReady) {
-        await initGoalCache();
-      }
-
-      state.isSearching = true;
-      state.abortController = new AbortController();
-      const { signal } = state.abortController;
-
-      const metrics = {
-        startTime: performance.now(),
-        apiCalls: 0,
-        scannedCount: 0,
-        depthLabel: '準備中',
-        phaseText: '出発記事を確認しています...'
-      };
-
-      // UIを検索中状態に切り替え
-      hideMessage();
-      el.resultSection.classList.add('hidden');
-      el.progressPanel.classList.remove('hidden');
-      el.searchBtn.classList.add('hidden');
-      el.cancelBtn.classList.remove('hidden');
-      el.randomBtn.disabled = true;
-
-      const timerId = setInterval(() => updateProgressUI(metrics), 100);
-
-      try {
-        // ---------------------------------------------------------------------
-        // Step 0: 出発記事の解決 & 0クリック判定
-        // ---------------------------------------------------------------------
-        updateProgressUI(metrics);
-        const resolved = await resolveStartArticle(rawInput, signal, metrics);
-
-        if (!resolved) {
-          showMessage(
-            'error',
-            '記事が見つかりませんでした',
-            `「${rawInput}」に一致する日本語版Wikipediaの記事が見つかりませんでした。別のキーワードでお試しください。`
-          );
-          return;
-        }
-
-        const startTitle = resolved.title;
-        const note = resolved.note;
-
-        if (state.goalAliases.has(startTitle)) {
-          await finalizeResult(startTitle, [state.canonicalGoal], [], metrics, note, signal);
-          return;
-        }
-
-        // ---------------------------------------------------------------------
-        // Step 1: 出発記事の発リンクを取得 → 1クリック判定
-        // ---------------------------------------------------------------------
-        metrics.depthLabel = '1クリック検索';
-        metrics.phaseText = `出発記事「${startTitle}」のリンクを取得中...`;
-        updateProgressUI(metrics);
-
-        const level1Links = await fetchOutgoingLinksSingle(startTitle, signal, metrics, 2);
-
-        if (level1Links.length === 0) {
-          showMessage(
-            'warning',
-            'リンクが見つかりませんでした',
-            `「${startTitle}」には他の記事への内部リンクが存在しないため、検索できませんでした。`
-          );
-          return;
-        }
-
-        for (const l of level1Links) {
-          if (state.goalAliases.has(l)) {
-            await finalizeResult(startTitle, [startTitle, state.canonicalGoal], [], metrics, note, signal);
-            return;
-          }
-        }
-
-        // ---------------------------------------------------------------------
-        // Step 2: 2クリック判定（キャッシュ照合 + pltitles精密検証）
-        // ---------------------------------------------------------------------
-        metrics.depthLabel = '2クリック検索';
-        metrics.phaseText = `ゴール側のリンクと照合中...（出発側 ${level1Links.length}件）`;
-        updateProgressUI(metrics);
-
-        // 2-A. まずキャッシュ済み被リンクと即座に突き合わせ
-        let step2Matches = level1Links.filter((l) => state.goalBacklinks.has(l));
-
-        // 2-B. キャッシュに漏れている直接リンク元も pltitles で最大150件まで精密チェック
-        if (step2Matches.length === 0) {
-          const prioritizedForCheck = [...level1Links]
-            .sort((a, b) => scoreIntermediateNode(b) - scoreIntermediateNode(a))
-            .slice(0, 150);
-          step2Matches = await checkDirectLinksToGoal(prioritizedForCheck, signal, metrics);
-        }
-
-        if (step2Matches.length > 0) {
-          // 最もわかりやすく面白いハブ記事を優先ソート
-          step2Matches.sort((a, b) => scoreIntermediateNode(b) - scoreIntermediateNode(a));
-          const uniqueMatches = Array.from(new Set(step2Matches));
-          const bestPath = [startTitle, uniqueMatches[0], state.canonicalGoal];
-          const altPaths = uniqueMatches.slice(1, 5).map((mid) => [startTitle, mid, state.canonicalGoal]);
-          await finalizeResult(startTitle, bestPath, altPaths, metrics, note, signal);
-          return;
-        }
-
-        // ---------------------------------------------------------------------
-        // Step 3: 3クリック判定（優先度順に出発記事のリンク先を展開）
-        // ---------------------------------------------------------------------
-        metrics.depthLabel = '3クリック検索';
-        metrics.phaseText = '中継候補の記事を展開してゴール側のリンクと照合中...';
-        updateProgressUI(metrics);
-
-        const prioritizedLevel1 = [...level1Links]
-          .sort((a, b) => scoreIntermediateNode(b) - scoreIntermediateNode(a))
-          .slice(0, 60);
-
-        const level2Map = await fetchOutgoingLinksBatch(prioritizedLevel1, signal, metrics);
-        const step3Paths = [];
-        const level2ParentMap = new Map(); // level2Node -> level1Node
-
-        for (const [mid1, outLinks] of level2Map.entries()) {
-          for (const mid2 of outLinks) {
-            if (mid2 === startTitle) continue;
-            if (state.goalBacklinks.has(mid2)) {
-              step3Paths.push([startTitle, mid1, mid2, state.canonicalGoal]);
-            } else if (!level2ParentMap.has(mid2)) {
-              level2ParentMap.set(mid2, mid1);
-            }
-          }
-        }
-
-        if (step3Paths.length > 0) {
-          // 見栄えの良いルート順に並べ替え
-          step3Paths.sort((pA, pB) => {
-            const sA = scoreIntermediateNode(pA[1]) + scoreIntermediateNode(pA[2]);
-            const sB = scoreIntermediateNode(pB[1]) + scoreIntermediateNode(pB[2]);
-            return sB - sA;
-          });
-
-          // 重複する経由パターンを除いて最大5件取得
-          const seenKeys = new Set();
-          const uniqueStep3 = [];
-          for (const p of step3Paths) {
-            const key = `${p[1]}->${p[2]}`;
-            if (!seenKeys.has(key)) {
-              seenKeys.add(key);
-              uniqueStep3.push(p);
-              if (uniqueStep3.length >= 5) break;
-            }
-          }
-
-          await finalizeResult(startTitle, uniqueStep3[0], uniqueStep3.slice(1), metrics, note, signal);
-          return;
-        }
-
-        // ---------------------------------------------------------------------
-        // Step 4: 4クリック判定（2ホップ目の有望ハブを展開してゴール被リンクと接続）
-        // ---------------------------------------------------------------------
-        metrics.depthLabel = '4クリック検索';
-        metrics.phaseText = 'さらに広いハブ記事を経由して4クリック経路を検索中...';
-        updateProgressUI(metrics);
-
-        const level2Candidates = Array.from(level2ParentMap.keys())
-          .sort((a, b) => scoreIntermediateNode(b) - scoreIntermediateNode(a))
-          .slice(0, 40);
-
-        const level3Map = await fetchOutgoingLinksBatch(level2Candidates, signal, metrics);
-        const step4Paths = [];
-
-        for (const [mid2, outLinks] of level3Map.entries()) {
-          const mid1 = level2ParentMap.get(mid2);
-          for (const mid3 of outLinks) {
-            if (mid3 === startTitle || mid3 === mid1) continue;
-            if (state.goalBacklinks.has(mid3)) {
-              step4Paths.push([startTitle, mid1, mid2, mid3, state.canonicalGoal]);
-              if (step4Paths.length >= 12) break;
-            }
-          }
-          if (step4Paths.length >= 12) break;
-        }
-
-        if (step4Paths.length > 0) {
-          step4Paths.sort((pA, pB) => {
-            const sA = scoreIntermediateNode(pA[2]) + scoreIntermediateNode(pA[3]);
-            const sB = scoreIntermediateNode(pB[2]) + scoreIntermediateNode(pB[3]);
-            return sB - sA;
-          });
-          await finalizeResult(startTitle, step4Paths[0], step4Paths.slice(1, 4), metrics, note, signal);
-          return;
-        }
-
-        // 4クリック以内で見つからなかった場合
-        showMessage(
-          'warning',
-          '4クリック以内のルートが見つかりませんでした',
-          `「${startTitle}」から4クリック以内では「${state.canonicalGoal}」への経路を発見できませんでした。孤立記事やリンクの少ない曖昧さ回避ページの可能性があります。別の記事でお試しください。`
-        );
-      } catch (err) {
-        if (err.name === 'AbortError') {
-          showMessage('info', '検索をキャンセルしました', '別のキーワードを入力して再度お試しいただけます。');
-        } else {
-          console.error(err);
-          showMessage(
-            'error',
-            '通信エラーが発生しました',
-            `Wikipedia APIとの通信中にエラーが発生しました（${err.message}）。しばらく待ってから再度お試しください。`
-          );
-        }
-      } finally {
-        clearInterval(timerId);
-        state.isSearching = false;
-        state.abortController = null;
-        el.progressPanel.classList.add('hidden');
-        el.searchBtn.classList.remove('hidden');
-        el.cancelBtn.classList.add('hidden');
-        el.randomBtn.disabled = false;
-      }
-    }
-
-    /**
-     * 進捗UIを更新
-     */
-    function updateProgressUI(metrics) {
-      const elapsed = ((performance.now() - metrics.startTime) / 1000).toFixed(1);
-      el.progressPhase.textContent = metrics.phaseText;
-      el.progressElapsed.textContent = `${elapsed}秒`;
-      el.metricDepth.textContent = metrics.depthLabel;
-      el.metricApiCalls.textContent = `${metrics.apiCalls}回`;
-      el.metricScanned.textContent = `${metrics.scannedCount.toLocaleString()}件`;
-    }
-
-    /**
-     * 見つかった最短経路の詳細（概要・サムネイル）を取得して結果画面を描画
-     */
-    async function finalizeResult(startTitle, winningPath, altPaths, metrics, note, signal) {
-      metrics.phaseText = 'ルート発見！記事の概要とサムネイルを取得中...';
-      updateProgressUI(metrics);
-
-      const elapsedSec = ((performance.now() - metrics.startTime) / 1000).toFixed(2);
-      const summaries = await fetchArticleSummaries(winningPath, signal);
-
-      state.currentResult = {
-        start: startTitle,
-        path: winningPath,
-        altPaths,
-        elapsedSec,
-        apiCalls: metrics.apiCalls,
-        scannedCount: metrics.scannedCount,
-        note,
-        summaries
-      };
-
-      renderResult(state.currentResult);
-      addToHistory({
-        start: startTitle,
-        clicks: winningPath.length - 1,
-        path: winningPath,
-        timestamp: Date.now()
-      });
-    }
-
-    // =========================================================================
-    // 結果レンダリング
-    // =========================================================================
-
-    function renderResult(result) {
-      const clicks = result.path.length - 1;
-      const goalTitle = result.path[result.path.length - 1];
-
-      // リダイレクト・近似検索の注記
-      if (result.note) {
-        el.resultNote.textContent = result.note;
-        el.resultNote.classList.remove('hidden');
-      } else {
-        el.resultNote.classList.add('hidden');
-      }
-
-      // 見出しバナー
-      if (clicks === 0) {
-        el.resultHeadline.innerHTML = `『${escapeHtml(result.start)}』はすでに<span class="text-gold-300">「${escapeHtml(goalTitle)}」</span>です！（0クリックで到達！）`;
-      } else {
-        el.resultHeadline.innerHTML = `『${escapeHtml(result.start)}』→『${escapeHtml(goalTitle)}』まで <span class="inline-flex items-baseline gap-1 text-gold-300 text-2xl sm:text-3xl font-black mx-1">${clicks}</span> クリックで到達！`;
-      }
-
-      el.resultMeta.textContent = `検索時間: ${result.elapsedSec}秒 ／ API通信: ${result.apiCalls}回 ／ 確認した記事数: ${result.scannedCount.toLocaleString()}件`;
-
-      // ルートカードチェーンの描画
-      el.pathChainContainer.innerHTML = '';
-      result.path.forEach((title, idx) => {
-        const isStart = idx === 0;
-        const isGoal = idx === result.path.length - 1;
-        const info = result.summaries.get(title) || {
-          title,
-          extract: 'Wikipediaで記事の本文を確認できます。',
-          thumbnail: null
-        };
-
-        // 矢印コネクター（2番目以降の前）
-        if (idx > 0) {
-          const arrowDiv = document.createElement('div');
-          arrowDiv.className = 'flex items-center justify-center py-2.5';
-          arrowDiv.innerHTML = `
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-verdy-50 border border-verdy-200 text-verdy-700 text-xs font-bold shadow-xs">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-              <span>${idx}クリック目</span>
-            </div>
-          `;
-          el.pathChainContainer.appendChild(arrowDiv);
-        }
-
-        // ロール別スタイル
-        let badgeHtml = `<span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[11px] font-bold">中継 ${idx}</span>`;
-        let cardBorder = 'border-slate-200 hover:border-verdy-300 bg-white';
-        if (isStart && isGoal) {
-          badgeHtml = `<span class="px-2 py-0.5 rounded-md bg-gold-500 text-slate-950 text-[11px] font-extrabold">出発 &amp; ゴール</span>`;
-          cardBorder = 'border-verdy-600 bg-verdy-50/40 ring-1 ring-verdy-600/20';
-        } else if (isStart) {
-          badgeHtml = `<span class="px-2 py-0.5 rounded-md bg-slate-800 text-white text-[11px] font-bold">出発記事</span>`;
-          cardBorder = 'border-slate-300 bg-slate-50/60';
-        } else if (isGoal) {
-          badgeHtml = `<span class="px-2 py-0.5 rounded-md bg-verdy-700 text-gold-300 text-[11px] font-extrabold">ゴール</span>`;
-          cardBorder = 'border-verdy-600 bg-verdy-50/50 ring-1 ring-verdy-600/20';
-        }
-
-        const wikiUrl = `https://ja.wikipedia.org/wiki/${encodeURIComponent(title)}`;
-        const thumbHtml = info.thumbnail
-          ? `<img src="${escapeHtml(info.thumbnail)}" alt="${escapeHtml(title)}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover bg-slate-100 border border-slate-200 shrink-0" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');" />
-             <div class="hidden w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-verdy-50 border border-verdy-100 flex items-center justify-center shrink-0 text-verdy-700 font-black text-xl">${escapeHtml(title.charAt(0))}</div>`
-          : `<div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl ${isGoal ? 'bg-verdy-700 text-gold-300' : 'bg-verdy-50 text-verdy-700'} border border-verdy-100 flex items-center justify-center shrink-0 font-black text-xl sm:text-2xl">${escapeHtml(title.charAt(0))}</div>`;
-
-        const card = document.createElement('div');
-        card.className = `rounded-xl border p-3.5 sm:p-4 transition ${cardBorder}`;
-        card.innerHTML = `
-          <div class="flex items-start gap-3.5 sm:gap-4">
-            ${thumbHtml}
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center flex-wrap gap-2 mb-1">
-                ${badgeHtml}
-                <h4 class="font-extrabold text-slate-900 text-base sm:text-lg truncate">${escapeHtml(title)}</h4>
-              </div>
-              <p class="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
-                ${escapeHtml(info.extract)}
-              </p>
-              <div class="mt-2">
-                <a
-                  href="${wikiUrl}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 text-xs font-semibold text-verdy-700 hover:text-verdy-500 hover:underline"
-                >
-                  <span>Wikipediaで記事を読む</span>
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        `;
-        el.pathChainContainer.appendChild(card);
-      });
-
-      // 別ルート候補の表示
-      if (result.altPaths && result.altPaths.length > 0) {
-        el.altRoutesBox.classList.remove('hidden');
-        el.altRoutesList.innerHTML = '';
-        result.altPaths.forEach((altPath, idx) => {
-          const mids = altPath.slice(1, -1).join(' → ');
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-verdy-50 border border-slate-200 hover:border-verdy-300 text-xs font-semibold text-slate-700 hover:text-verdy-800 transition cursor-pointer';
-          btn.textContent = `経由: ${mids}`;
-          btn.addEventListener('click', () => switchToAlternativeRoute(idx));
-          el.altRoutesList.appendChild(btn);
-        });
-      } else {
-        el.altRoutesBox.classList.add('hidden');
-      }
-
-      el.resultSection.classList.remove('hidden');
-    }
-
-    /**
-     * 別ルート候補をクリックしたときに表示ルートを切り替え
-     */
-    async function switchToAlternativeRoute(altIndex) {
-      if (!state.currentResult) return;
-      const chosen = state.currentResult.altPaths[altIndex];
-      const previousMain = state.currentResult.path;
-
-      const newAlts = [...state.currentResult.altPaths];
-      newAlts[altIndex] = previousMain;
-
-      try {
-        const summaries = await fetchArticleSummaries(chosen);
-        state.currentResult = {
-          ...state.currentResult,
-          path: chosen,
-          altPaths: newAlts,
-          summaries
-        };
-        renderResult(state.currentResult);
-        showToast('別ルートに切り替えました');
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    /**
-     * 現在表示中のルートからシェア・コピー用テキストを生成
-     * @param {Object} result - 現在の検索結果
-     * @param {boolean} includeUrl - 末尾に公開URLを含めるかどうか（コピー用）
-     */
-    function buildShareText(result, includeUrl = false) {
-      const { path } = result;
-      const start = path[0];
-      const goal = path[path.length - 1];
-      const clicks = path.length - 1;
-      const routeLine = path.join(' → ');
-      let text = `「${start}」から「${goal}」までWikipediaで${clicks}クリックで到達！\n${routeLine}\n#東京ヴェルディ #東京ヴェルディへの最短ルート検索`;
-
-      if (includeUrl) {
-        const shareUrl = getPublicUrl();
-        if (shareUrl) {
-          text += `\n${shareUrl}`;
-        }
-      }
-      return text;
-    }
-
-    /**
-     * 結果をX(旧Twitter)の投稿画面でシェア
-     */
-    function shareResultOnX() {
-      if (!state.currentResult) return;
-      const text = buildShareText(state.currentResult, false);
-      const shareUrl = getPublicUrl();
-      let intentUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
-      if (shareUrl) {
-        intentUrl += `&url=${encodeURIComponent(shareUrl)}`;
-      }
-      window.open(intentUrl, '_blank', 'noopener,noreferrer');
-    }
-
-    /**
-     * 結果をクリップボードへコピー（iFrame対応のため execCommand を優先使用）
-     */
-    let copyLabelTimer = null;
-    function copyCurrentResult() {
-      if (!state.currentResult) return;
-      const text = buildShareText(state.currentResult, true);
-
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.focus();
-      textarea.select();
-
-      let copied = false;
-      try {
-        copied = document.execCommand('copy');
-      } catch (e) {
-        copied = false;
-      }
-      document.body.removeChild(textarea);
-
-      const onSuccess = () => {
-        showToast('コピーしました！');
-        el.copyBtnLabel.textContent = 'コピーしました！';
-        clearTimeout(copyLabelTimer);
-        copyLabelTimer = setTimeout(() => {
-          el.copyBtnLabel.textContent = '結果をコピー';
-        }, 2000);
-      };
-
-      if (copied) {
-        onSuccess();
-      } else if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text)
-          .then(onSuccess)
-          .catch(() => showToast('コピーに失敗しました'));
-      } else {
-        showToast('コピーに失敗しました');
-      }
-    }
-
-    // =========================================================================
-    // オートコンプリート（Wikipedia opensearch）
-    // =========================================================================
-
-    async function fetchSuggestions(query) {
-      const q = query.trim();
-      if (!q) {
-        closeSuggestions();
-        return;
-      }
-      try {
-        const url = `${WIKI_API}?action=opensearch&search=${encodeURIComponent(q)}&limit=6&namespace=0&format=json&origin=*`;
-        const res = await fetch(url);
-        if (!res.ok) return;
-        const data = await res.json();
-        const titles = Array.isArray(data[1]) ? data[1] : [];
-
-        // 入力値が変わっていたら無視
-        if (el.startInput.value.trim() !== q) return;
-
-        state.acItems = titles;
-        state.acIndex = -1;
-        renderSuggestions(titles);
-      } catch (err) {
-        // 補完エラーは無視して検索続行可能にする
-      }
-    }
-
-    function renderSuggestions(titles) {
-      if (titles.length === 0) {
-        closeSuggestions();
-        return;
-      }
-      el.suggestionsList.innerHTML = '';
-      titles.forEach((title) => {
-        const li = document.createElement('li');
-        li.role = 'option';
-        li.className = 'px-4 py-2.5 text-sm text-slate-800 hover:bg-verdy-50 hover:text-verdy-800 cursor-pointer flex items-center justify-between transition';
-        li.innerHTML = `
-          <span class="font-medium truncate">${escapeHtml(title)}</span>
-          <span class="text-[11px] text-slate-400 shrink-0 ml-2">Wikipedia</span>
-        `;
-        li.addEventListener('mousedown', (e) => {
-          e.preventDefault();
-          selectSuggestion(title);
-        });
-        el.suggestionsList.appendChild(li);
-      });
-      el.suggestionsList.classList.remove('hidden');
-    }
-
-    function selectSuggestion(title) {
-      el.startInput.value = title;
-      el.clearInputBtn.classList.remove('hidden');
-      closeSuggestions();
-      findShortestPathToVerdy(title);
-    }
-
-    function closeSuggestions() {
-      el.suggestionsList.classList.add('hidden');
-      state.acItems = [];
-      state.acIndex = -1;
-    }
-
-    function highlightSuggestion(newIndex) {
-      const items = el.suggestionsList.querySelectorAll('li');
-      if (items.length === 0) return;
-      state.acIndex = (newIndex + items.length) % items.length;
-      items.forEach((li, i) => {
-        if (i === state.acIndex) {
-          li.classList.add('bg-verdy-50', 'text-verdy-800');
-        } else {
-          li.classList.remove('bg-verdy-50', 'text-verdy-800');
-        }
-      });
-    }
-
-    // =========================================================================
-    // ランダム記事取得
-    // =========================================================================
-
-    async function tryRandomArticle() {
-      if (state.isSearching) return;
-      el.randomBtn.disabled = true;
-      try {
-        const data = await wikiFetch({
-          action: 'query',
-          list: 'random',
-          rnnamespace: 0,
-          rnlimit: 1
-        });
-        const randomTitle = data.query?.random?.[0]?.title;
-        if (randomTitle) {
-          el.startInput.value = randomTitle;
-          el.clearInputBtn.classList.remove('hidden');
-          closeSuggestions();
-          await findShortestPathToVerdy(randomTitle);
-        }
-      } catch (err) {
-        showMessage('error', 'ランダム記事の取得に失敗しました', '通信状態を確認してもう一度お試しください。');
-      } finally {
-        if (!state.isSearching) {
-          el.randomBtn.disabled = false;
-        }
-      }
-    }
-
-    // =========================================================================
-    // 検索履歴（localStorage + メモリ）
-    // =========================================================================
-
-    const HISTORY_KEY = 'verdy_wiki_finder_history_v1';
-
-    function loadHistory() {
-      try {
-        const raw = localStorage.getItem(HISTORY_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            state.history = parsed.slice(0, 12);
-          }
-        }
-      } catch (e) {
-        // localStorageが制限されている環境ではメモリのみで動作
-      }
-      renderHistory();
-    }
-
-    function saveHistory() {
-      try {
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(state.history));
-      } catch (e) {
-        // ignore
-      }
-    }
-
-    function addToHistory(entry) {
-      // 同一スタート記事の古い履歴を先頭へ更新
-      state.history = state.history.filter((h) => h.start !== entry.start);
-      state.history.unshift(entry);
-      if (state.history.length > 12) {
-        state.history = state.history.slice(0, 12);
-      }
-      saveHistory();
-      renderHistory();
-    }
-
-    function renderHistory() {
-      if (state.history.length === 0) {
-        el.clearHistoryBtn.classList.add('hidden');
-        el.historyList.innerHTML = `<p class="text-xs text-slate-400 py-2">まだ検索履歴がありません。上の検索欄やプリセットから試してみてください。</p>`;
-        return;
-      }
-
-      el.clearHistoryBtn.classList.remove('hidden');
-      el.historyList.innerHTML = '';
-
-      state.history.forEach((item) => {
-        const timeStr = formatTimestamp(item.timestamp);
-        const row = document.createElement('button');
-        row.type = 'button';
-        row.className = 'w-full text-left flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 hover:bg-verdy-50 border border-slate-100 hover:border-verdy-200 transition cursor-pointer group';
-        row.innerHTML = `
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-slate-800 group-hover:text-verdy-800 text-sm truncate">${escapeHtml(item.start)}</span>
-              ${timeStr ? `<span class="text-[11px] text-slate-400 shrink-0">${escapeHtml(timeStr)}</span>` : ''}
-            </div>
-            <div class="text-xs text-slate-500 truncate mt-0.5">${escapeHtml(item.path.join(' → '))}</div>
-          </div>
-          <span class="shrink-0 px-2.5 py-1 rounded-lg bg-verdy-700 text-white text-xs font-extrabold">
-            ${item.clicks}クリック
-          </span>
-        `;
-        row.addEventListener('click', () => {
-          el.startInput.value = item.start;
-          el.clearInputBtn.classList.remove('hidden');
-          findShortestPathToVerdy(item.start);
-        });
-        el.historyList.appendChild(row);
-      });
-    }
 
     function escapeHtml(str) {
-      return String(str)
+      return String(str || '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
@@ -1647,109 +535,1864 @@
         .replace(/'/g, '&#39;');
     }
 
+    function normalizeTitle(title) {
+      return String(title || '').replace(/_/g, ' ').trim();
+    }
+
+    function isGoalTitle(title) {
+      return state.goalAliases.has(normalizeTitle(title));
+    }
+
+    function isExcludedIntermediate(title, excludeTokyo) {
+      if (!excludeTokyo) return false;
+      return EXCLUDED_TOKYO_TITLES.has(normalizeTitle(title));
+    }
+
+    function isDateOrListTitle(title) {
+      return /^(\d+年|\d+月\d+日|\d+年代|一覧|Category:)/.test(title) || /の一覧$/.test(title);
+    }
+
+    function wikiArticleUrl(title) {
+      return `https://ja.wikipedia.org/wiki/${encodeURIComponent(String(title).replace(/ /g, '_'))}`;
+    }
+
+    /**
+     * 公開URLを取得（手動設定を優先し、空欄時は公開ホスト上なら自動取得）
+     */
+    function getPublicUrl() {
+      const manual = (PUBLIC_URL || '').trim();
+      if (manual) return manual;
+      try {
+        const loc = window.location;
+        if (!loc || (loc.protocol !== 'http:' && loc.protocol !== 'https:')) return '';
+        const host = loc.hostname || '';
+        if (
+          !host ||
+          host === 'localhost' ||
+          host === '127.0.0.1' ||
+          host.endsWith('.local') ||
+          host.includes('googleusercontent.com') ||
+          host.includes('webcontainer')
+        ) {
+          return '';
+        }
+        return `${loc.origin}${loc.pathname}`;
+      } catch {
+        return '';
+      }
+    }
+
+    function showToast(text) {
+      el.toastText.textContent = text;
+      el.toast.classList.remove('hidden');
+      el.toast.classList.add('inline-flex');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.toast.classList.add('hidden');
+        el.toast.classList.remove('inline-flex');
+      }, 2400);
+    }
+
+    function showMessage(type, title, body) {
+      const styles = {
+        error: {
+          wrap: 'bg-rose-50 border-rose-200 text-rose-900',
+          icon: '<svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86l-7.1 12.28A2 2 0 004.92 19h14.16a2 2 0 001.73-2.86l-7.1-12.28a2 2 0 00-3.42 0z"/></svg>'
+        },
+        warning: {
+          wrap: 'bg-amber-50 border-amber-200 text-amber-900',
+          icon: '<svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+        },
+        info: {
+          wrap: 'bg-sky-50 border-sky-200 text-sky-900',
+          icon: '<svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+        }
+      };
+      const style = styles[type] || styles.info;
+      el.messageBox.className = `rounded-2xl border p-4 sm:p-5 animate-fade-up ${style.wrap}`;
+      el.messageIcon.innerHTML = style.icon;
+      el.messageTitle.textContent = title;
+      el.messageBody.textContent = body;
+      el.messageBox.classList.remove('hidden');
+    }
+
+    function hideMessage() {
+      el.messageBox.classList.add('hidden');
+    }
+
+    /**
+     * 並列数制限つき非同期マップ実行ユーティリティ
+     */
+    async function runWithConcurrency(items, concurrency, worker, signal) {
+      const results = new Array(items.length);
+      let nextIdx = 0;
+
+      const runner = async () => {
+        while (nextIdx < items.length) {
+          if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+          const idx = nextIdx++;
+          results[idx] = await worker(items[idx], idx);
+        }
+      };
+
+      const workers = [];
+      const count = Math.min(concurrency, items.length);
+      for (let i = 0; i < count; i++) {
+        workers.push(runner());
+      }
+      await Promise.all(workers);
+      return results;
+    }
+
     // =========================================================================
-    // 初期化 & イベントバインド
+    // Wikipedia API 通信 & 本文リンク抽出エンジン（脚注・折りたたみ一覧表を常時除外）
     // =========================================================================
 
-    function initPresets() {
-      el.presetContainer.innerHTML = '';
-      PRESET_WORDS.forEach((word) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-verdy-50 text-slate-700 hover:text-verdy-800 border border-slate-200/80 hover:border-verdy-300 text-xs sm:text-sm font-semibold transition cursor-pointer';
-        btn.textContent = word;
-        btn.addEventListener('click', () => {
-          el.startInput.value = word;
-          el.clearInputBtn.classList.remove('hidden');
-          closeSuggestions();
-          findShortestPathToVerdy(word);
-        });
-        el.presetContainer.appendChild(btn);
+    // グローバルAPIレート制御（HTTP 429回避のため同時実行数と送信間隔を制御）
+    const apiLimiter = {
+      active: 0,
+      maxConcurrent: 2,
+      minIntervalMs: 220,
+      lastRequestTime: 0,
+      queue: []
+    };
+
+    function abortableSleep(ms, signal) {
+      return new Promise((resolve, reject) => {
+        if (signal?.aborted) {
+          reject(new DOMException('Aborted', 'AbortError'));
+          return;
+        }
+        const onAbort = () => {
+          clearTimeout(timer);
+          reject(new DOMException('Aborted', 'AbortError'));
+        };
+        const timer = setTimeout(() => {
+          if (signal) signal.removeEventListener('abort', onAbort);
+          resolve();
+        }, ms);
+        if (signal) {
+          signal.addEventListener('abort', onAbort, { once: true });
+        }
       });
     }
 
-    function bindEvents() {
-      // フォーム送信
-      el.searchForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const val = el.startInput.value.trim();
-        if (!val) {
-          showMessage('info', 'キーワードを入力してください', '出発点となるWikipediaの記事名や言葉を入力してください。');
-          el.startInput.focus();
+    function acquireApiSlot(signal) {
+      return new Promise((resolve, reject) => {
+        if (signal?.aborted) {
+          reject(new DOMException('Aborted', 'AbortError'));
           return;
         }
+
+        const entry = { resolve, reject, signal, onAbort: null, run: null };
+
+        const tryRun = () => {
+          if (entry.signal && entry.onAbort) {
+            entry.signal.removeEventListener('abort', entry.onAbort);
+          }
+          apiLimiter.active += 1;
+          const now = Date.now();
+          const waitMs = Math.max(0, apiLimiter.minIntervalMs - (now - apiLimiter.lastRequestTime));
+          apiLimiter.lastRequestTime = now + waitMs;
+
+          if (waitMs > 0) {
+            abortableSleep(waitMs, signal)
+              .then(() => resolve())
+              .catch((err) => {
+                releaseApiSlot();
+                reject(err);
+              });
+          } else {
+            resolve();
+          }
+        };
+
+        if (signal) {
+          entry.onAbort = () => {
+            const idx = apiLimiter.queue.indexOf(entry);
+            if (idx !== -1) apiLimiter.queue.splice(idx, 1);
+            reject(new DOMException('Aborted', 'AbortError'));
+          };
+          signal.addEventListener('abort', entry.onAbort, { once: true });
+        }
+
+        if (apiLimiter.active < apiLimiter.maxConcurrent && apiLimiter.queue.length === 0) {
+          tryRun();
+        } else {
+          entry.run = tryRun;
+          apiLimiter.queue.push(entry);
+        }
+      });
+    }
+
+    function releaseApiSlot() {
+      apiLimiter.active = Math.max(0, apiLimiter.active - 1);
+      while (apiLimiter.active < apiLimiter.maxConcurrent && apiLimiter.queue.length > 0) {
+        const nextEntry = apiLimiter.queue.shift();
+        if (nextEntry.signal?.aborted) continue;
+        nextEntry.run();
+      }
+    }
+
+    /**
+     * MediaWiki API へCORS対応リクエストを送信（レート制御 & HTTP 429/503 自動バックオフ再試行付き）
+     */
+    async function wikiFetch(params, signal, countMetric = true) {
+      const url = new URL(WIKI_API);
+      const merged = {
+        format: 'json',
+        formatversion: '2',
+        origin: '*',
+        ...params
+      };
+      for (const [k, v] of Object.entries(merged)) {
+        if (v !== undefined && v !== null) {
+          url.searchParams.set(k, String(v));
+        }
+      }
+
+      const maxRetries = 3;
+      let lastStatus = 0;
+
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        await acquireApiSlot(signal);
+        let res;
+        try {
+          if (countMetric && state.isSearching && attempt === 0) {
+            state.apiCalls += 1;
+            el.metricApiCalls.textContent = `${state.apiCalls}回`;
+          }
+          res = await fetch(url.toString(), { signal });
+        } finally {
+          releaseApiSlot();
+        }
+
+        lastStatus = res.status;
+
+        if (res.status === 429 || res.status === 503) {
+          if (attempt < maxRetries) {
+            const retryAfterSec = parseInt(res.headers.get('Retry-After') || '', 10);
+            const baseDelay = Number.isFinite(retryAfterSec) && retryAfterSec > 0
+              ? retryAfterSec * 1000
+              : 1500 * Math.pow(2, attempt) + Math.floor(Math.random() * 400);
+            const delayMs = Math.min(baseDelay, 8000);
+
+            apiLimiter.lastRequestTime = Math.max(apiLimiter.lastRequestTime, Date.now() + delayMs);
+
+            if (state.isSearching) {
+              updateProgress(
+                `Wikipediaのアクセス制限を回避するため待機中...（自動再試行 ${attempt + 1}/${maxRetries}）`,
+                null
+              );
+            }
+            await abortableSleep(delayMs, signal);
+            continue;
+          }
+
+          const rateErr = new Error(`Wikipedia API通信エラー (HTTP ${res.status})`);
+          rateErr.isRateLimit = true;
+          throw rateErr;
+        }
+
+        if (!res.ok) {
+          throw new Error(`Wikipedia API通信エラー (HTTP ${res.status})`);
+        }
+
+        const data = await res.json();
+        if (data && data.error) {
+          throw new Error(data.error.info || 'Wikipedia APIエラー');
+        }
+        return data;
+      }
+
+      const fallbackErr = new Error(`Wikipedia API通信エラー (HTTP ${lastStatus || 429})`);
+      fallbackErr.isRateLimit = true;
+      throw fallbackErr;
+    }
+
+    /**
+     * 記事HTMLから脚注・出典セクションおよび記事下部の折りたたみ一覧表（ナビゲーションボックス／テンプレート）を
+     * すべて除去し、本文中の標準名前空間リンクのみを抽出する
+     */
+    function extractCleanBodyLinksFromHtml(htmlString, selfTitle) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString || '', 'text/html');
+      const root = doc.querySelector('.mw-parser-output') || doc.body;
+      if (!root) return new Set();
+
+      // 1. 「脚注」「注釈」「出典」「参考文献」などの見出し配下のセクションを丸ごと除去
+      const children = Array.from(root.children);
+      let removingDepth = 0;
+      for (const child of children) {
+        const headingEl = child.matches('h1, h2, h3, h4, h5, h6')
+          ? child
+          : child.classList.contains('mw-heading')
+            ? child.querySelector('h1, h2, h3, h4, h5, h6')
+            : null;
+
+        if (headingEl) {
+          const level = parseInt(headingEl.tagName.slice(1), 10) || 2;
+          const headlineText = (headingEl.querySelector('.mw-headline')?.textContent || headingEl.textContent || '')
+            .replace(/\[編集\]/g, '')
+            .trim();
+
+          if (removingDepth > 0 && level <= removingDepth) {
+            removingDepth = 0;
+          }
+          if (EXCLUDED_SECTION_HEADINGS.has(headlineText)) {
+            removingDepth = level;
+            child.remove();
+            continue;
+          }
+        }
+
+        if (removingDepth > 0) {
+          child.remove();
+        }
+      }
+
+      // 2. 脚注ブロック、ナビゲーションボックス、記事下部の折りたたみ一覧表・テンプレート類を除去
+      const removeSelectors = [
+        '.reflist',
+        '.references',
+        'ol.references',
+        '.mw-references-wrap',
+        'sup.reference',
+        '.reference',
+        '.navbox',
+        '.navbox-inner',
+        '.navbox-subgroup',
+        '.NavFrame',
+        '[role="navigation"]',
+        '.sistersitebox',
+        '.authority-control',
+        '.asbox',
+        '.stub',
+        '.portal',
+        '.catlinks',
+        '.printfooter',
+        '.mw-editsection',
+        '.ambox',
+        '.ombox',
+        '.tmbox',
+        '.cmbox',
+        '.noprint',
+        '.metadata'
+      ];
+      for (const sel of removeSelectors) {
+        root.querySelectorAll(sel).forEach((node) => node.remove());
+      }
+
+      // 3. Infobox以外の折りたたみ一覧表（.mw-collapsible / .collapsible）を除去
+      root.querySelectorAll('.mw-collapsible, .collapsible').forEach((node) => {
+        if (!node.closest('.infobox')) {
+          node.remove();
+        }
+      });
+
+      // 4. 残った本文領域から標準名前空間の内部リンクを抽出
+      const links = new Set();
+      const selfNorm = normalizeTitle(selfTitle);
+
+      root.querySelectorAll('a[href]').forEach((a) => {
+        if (a.classList.contains('new') || a.classList.contains('external') || a.classList.contains('extiw')) {
+          return;
+        }
+        const href = a.getAttribute('href') || '';
+        if (!href.startsWith('/wiki/')) return;
+
+        let rawTitle = href.slice('/wiki/'.length).split('#')[0].split('?')[0];
+        if (!rawTitle) return;
+
+        try {
+          rawTitle = decodeURIComponent(rawTitle);
+        } catch {
+          return;
+        }
+
+        const title = normalizeTitle(rawTitle);
+        if (!title || title === selfNorm) return;
+
+        // 名前空間プレフィックス（Wikipedia:, Category:, Template:, File:, Portal:, Help:, Special:, 特別: など）を除外
+        if (/^(Wikipedia|Category|Template|File|Image|Portal|Help|Special|Module|MediaWiki|User|Talk|プロジェクト|カテゴリ|テンプレート|ファイル|画像|ポータル|ヘルプ|特別|モジュール|利用者|ノート|議論):/i.test(title)) {
+          return;
+        }
+
+        links.add(title);
+      });
+
+      return links;
+    }
+
+    /**
+     * 指定記事の「本文リンク（脚注・折りたたみ一覧表を除外）」を取得（キャッシュ付き）
+     */
+    async function getCleanBodyLinks(title, signal) {
+      const key = normalizeTitle(title);
+      if (state.cleanLinksCache.has(key)) {
+        return state.cleanLinksCache.get(key);
+      }
+
+      const data = await wikiFetch(
+        {
+          action: 'parse',
+          page: key,
+          prop: 'text',
+          redirects: '1',
+          disableeditsection: '1',
+          disabletoc: '1'
+        },
+        signal
+      );
+
+      const html = data?.parse?.text || '';
+      const resolvedTitle = normalizeTitle(data?.parse?.title || key);
+      const cleanSet = extractCleanBodyLinksFromHtml(html, resolvedTitle);
+
+      state.cleanLinksCache.set(key, cleanSet);
+      if (resolvedTitle && resolvedTitle !== key) {
+        state.cleanLinksCache.set(resolvedTitle, cleanSet);
+      }
+
+      state.scannedCount += cleanSet.size;
+      el.metricScanned.textContent = `${state.scannedCount.toLocaleString()}件`;
+      return cleanSet;
+    }
+
+    /**
+     * 指定記事が「本文リンク」から直接ゴール記事へリンクしているかをHTML裏取り検証
+     */
+    async function verifyCleanLinkToGoal(title, signal) {
+      const key = normalizeTitle(title);
+      if (state.verifiedGoalSources.has(key)) return true;
+      if (state.rejectedGoalSources.has(key)) return false;
+
+      try {
+        const cleanLinks = await getCleanBodyLinks(key, signal);
+        for (const alias of state.goalAliases) {
+          if (cleanLinks.has(alias)) {
+            state.verifiedGoalSources.add(key);
+            return true;
+          }
+        }
+        state.rejectedGoalSources.add(key);
+        return false;
+      } catch (err) {
+        if (err.name === 'AbortError' || err.isRateLimit) throw err;
+        return false;
+      }
+    }
+
+    /**
+     * 複数記事（最大50件ずつ）から特定のターゲット記事群（最大50件ずつ）への
+     * リンク有無を pltitles で1〜数回のAPIリクエストに圧縮して一括照合する
+     */
+    async function batchCheckLinksToTargets(sourceTitles, targetTitles, signal) {
+      const resultMap = new Map();
+      if (!sourceTitles || sourceTitles.length === 0 || !targetTitles || targetTitles.length === 0) {
+        return resultMap;
+      }
+
+      const srcChunkSize = 50;
+      const tgtChunkSize = 50;
+
+      for (let i = 0; i < sourceTitles.length; i += srcChunkSize) {
+        const srcChunk = sourceTitles.slice(i, i + srcChunkSize);
+        const srcSet = new Set(srcChunk);
+
+        for (let j = 0; j < targetTitles.length; j += tgtChunkSize) {
+          if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+          const tgtChunk = targetTitles.slice(j, j + tgtChunkSize);
+
+          let plcontinue = null;
+          let rounds = 0;
+          do {
+            const params = {
+              action: 'query',
+              titles: srcChunk.join('|'),
+              prop: 'links',
+              pltitles: tgtChunk.join('|'),
+              pllimit: 'max',
+              redirects: '1'
+            };
+            if (plcontinue) params.plcontinue = plcontinue;
+
+            const data = await wikiFetch(params, signal);
+            const reverseMap = new Map();
+            for (const n of data?.query?.normalized || []) {
+              if (!reverseMap.has(n.to)) reverseMap.set(n.to, []);
+              reverseMap.get(n.to).push(n.from);
+            }
+            for (const r of data?.query?.redirects || []) {
+              const origs = reverseMap.get(r.from) || [r.from];
+              if (!reverseMap.has(r.to)) reverseMap.set(r.to, []);
+              reverseMap.get(r.to).push(...origs);
+            }
+
+            for (const page of data?.query?.pages || []) {
+              if (!page.links || page.links.length === 0) continue;
+              const keys = new Set(reverseMap.get(page.title) || []);
+              if (srcSet.has(page.title) || keys.size === 0) {
+                keys.add(page.title);
+              }
+              for (const k of keys) {
+                if (!resultMap.has(k)) resultMap.set(k, new Set());
+                const set = resultMap.get(k);
+                for (const link of page.links) {
+                  set.add(link.title);
+                }
+              }
+              state.scannedCount += page.links.length;
+            }
+            el.metricScanned.textContent = `${state.scannedCount.toLocaleString()}件`;
+
+            plcontinue = data?.continue?.plcontinue || null;
+            rounds += 1;
+          } while (plcontinue && rounds < 2);
+        }
+      }
+
+      const out = new Map();
+      for (const [k, set] of resultMap.entries()) {
+        out.set(k, Array.from(set));
+      }
+      return out;
+    }
+
+    /**
+     * 複数記事の発リンク（標準名前空間）を一括取得（キャッシュ対応・軽量チャンク）
+     */
+    async function batchFetchOutgoingLinks(titles, signal) {
+      const resultMap = new Map();
+      if (!titles || titles.length === 0) return resultMap;
+
+      const uncached = [];
+      for (const t of titles) {
+        if (state.outgoingLinksCache.has(t)) {
+          resultMap.set(t, state.outgoingLinksCache.get(t));
+        } else {
+          uncached.push(t);
+        }
+      }
+
+      const chunkSize = 10;
+      for (let i = 0; i < uncached.length; i += chunkSize) {
+        if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+        const chunk = uncached.slice(i, i + chunkSize);
+        const chunkSet = new Set(chunk);
+        const chunkAccum = new Map();
+        for (const t of chunk) chunkAccum.set(t, new Set());
+
+        let plcontinue = null;
+        let rounds = 0;
+        do {
+          const params = {
+            action: 'query',
+            titles: chunk.join('|'),
+            prop: 'links',
+            plnamespace: '0',
+            pllimit: 'max',
+            redirects: '1'
+          };
+          if (plcontinue) params.plcontinue = plcontinue;
+
+          const data = await wikiFetch(params, signal);
+          const pages = data?.query?.pages || [];
+          const reverseMap = new Map();
+          for (const n of data?.query?.normalized || []) {
+            if (!reverseMap.has(n.to)) reverseMap.set(n.to, []);
+            reverseMap.get(n.to).push(n.from);
+          }
+          for (const r of data?.query?.redirects || []) {
+            const origs = reverseMap.get(r.from) || [r.from];
+            if (!reverseMap.has(r.to)) reverseMap.set(r.to, []);
+            reverseMap.get(r.to).push(...origs);
+          }
+
+          for (const page of pages) {
+            if (!page.links) continue;
+            const keys = new Set(reverseMap.get(page.title) || []);
+            if (chunkSet.has(page.title) || keys.size === 0) {
+              keys.add(page.title);
+            }
+            for (const k of keys) {
+              if (!chunkAccum.has(k)) chunkAccum.set(k, new Set());
+              const set = chunkAccum.get(k);
+              for (const link of page.links) {
+                set.add(link.title);
+              }
+            }
+            state.scannedCount += page.links.length;
+          }
+          el.metricScanned.textContent = `${state.scannedCount.toLocaleString()}件`;
+
+          plcontinue = data?.continue?.plcontinue || null;
+          rounds += 1;
+        } while (plcontinue && rounds < 2);
+
+        for (const [k, set] of chunkAccum.entries()) {
+          const arr = Array.from(set);
+          state.outgoingLinksCache.set(k, arr);
+          resultMap.set(k, arr);
+        }
+      }
+
+      return resultMap;
+    }
+
+    /**
+     * 入力キーワードからWikipediaの正規記事名を解決（リダイレクト・あいまい検索対応）
+     */
+    async function resolveStartArticle(rawQuery, signal) {
+      const trimmed = rawQuery.trim();
+      const infoData = await wikiFetch(
+        {
+          action: 'query',
+          titles: trimmed,
+          redirects: '1'
+        },
+        signal
+      );
+
+      const page = (infoData?.query?.pages || [])[0];
+      if (page && !page.missing && !page.invalid) {
+        const redirectInfo = (infoData?.query?.redirects || [])[0];
+        const note = redirectInfo
+          ? `「${redirectInfo.from}」から「${page.title}」へリダイレクトされました。`
+          : '';
+        return { title: page.title, note };
+      }
+
+      // 完全一致しない場合はWikipedia内検索の上位1件へフォールバック
+      const searchData = await wikiFetch(
+        {
+          action: 'query',
+          list: 'search',
+          srsearch: trimmed,
+          srnamespace: '0',
+          srlimit: '1'
+        },
+        signal
+      );
+
+      const hit = (searchData?.query?.search || [])[0];
+      if (hit && hit.title) {
+        return {
+          title: hit.title,
+          note: `「${trimmed}」に一致する記事が見つからなかったため、最も近い記事「${hit.title}」から検索しました。`
+        };
+      }
+
+      return null;
+    }
+
+    /**
+     * 起動時のゴール情報・被リンク・主要ハブキャッシュの初期化
+     */
+    function initGoalCache() {
+      if (state.cachePromise) return state.cachePromise;
+
+      state.cachePromise = (async () => {
+        try {
+          el.cacheStatusText.textContent = 'ゴール情報を準備中...';
+
+          // 1. ゴール記事の正規タイトルとリダイレクト別名を取得
+          const goalInfo = await wikiFetch(
+            {
+              action: 'query',
+              titles: GOAL_QUERY_TITLE,
+              prop: 'redirects',
+              rdnamespace: '0',
+              rdlimit: '50',
+              redirects: '1'
+            },
+            null,
+            false
+          );
+
+          const goalPage = (goalInfo?.query?.pages || [])[0];
+          if (goalPage && goalPage.title) {
+            state.canonicalGoal = goalPage.title;
+            state.goalAliases.add(goalPage.title);
+            for (const rd of goalPage.redirects || []) {
+              if (rd.title) state.goalAliases.add(rd.title);
+            }
+          }
+
+          // 2. 主要ハブからのリンク有無と被リンク（最大1,000件）を順次取得（バースト通信を回避）
+          const fetchSuperHubChecks = async () => {
+            const targetTitles = Array.from(state.goalAliases).slice(0, 10).join('|');
+            const data = await wikiFetch(
+              {
+                action: 'query',
+                titles: SUPER_HUB_CANDIDATES.slice(0, 50).join('|'),
+                prop: 'links',
+                pltitles: targetTitles,
+                pllimit: 'max',
+                redirects: '1'
+              },
+              null,
+              false
+            );
+            for (const page of data?.query?.pages || []) {
+              if (page.links && page.links.length > 0 && !isGoalTitle(page.title)) {
+                state.verifiedDirectHubs.add(page.title);
+                state.goalBacklinks.add(page.title);
+              }
+            }
+          };
+
+          const fetchBacklinks = async () => {
+            let blcontinue = null;
+            for (let page = 0; page < 2; page++) {
+              const params = {
+                action: 'query',
+                list: 'backlinks',
+                bltitle: state.canonicalGoal,
+                blnamespace: '0',
+                bllimit: '500',
+                blfilterredir: 'nonredirects'
+              };
+              if (blcontinue) params.blcontinue = blcontinue;
+              const blData = await wikiFetch(params, null, false);
+              for (const item of blData?.query?.backlinks || []) {
+                if (item.title && !isGoalTitle(item.title)) {
+                  state.goalBacklinks.add(item.title);
+                }
+              }
+              blcontinue = blData?.continue?.blcontinue || null;
+              if (!blcontinue) break;
+            }
+          };
+
+          await fetchSuperHubChecks();
+          await fetchBacklinks();
+
+          state.cacheReady = true;
+          el.cacheStatusDot.className = 'w-2 h-2 rounded-full bg-emerald-300';
+          el.cacheStatusText.textContent = `準備完了（ゴール周辺 ${state.goalBacklinks.size.toLocaleString()}記事キャッシュ済）`;
+        } catch (err) {
+          console.error('ゴールキャッシュ初期化エラー:', err);
+          el.cacheStatusDot.className = 'w-2 h-2 rounded-full bg-amber-300';
+          el.cacheStatusText.textContent = 'オンライン検索モード（再試行可能）';
+          state.cachePromise = null;
+        }
+      })();
+
+      return state.cachePromise;
+    }
+
+    /**
+     * 中継候補の優先度ソート（ハブ記事を優先し、日付・一覧記事は後回し）
+     */
+    function prioritizeCandidates(titles, excludeTokyo) {
+      const filtered = titles.filter((t) => !isExcludedIntermediate(t, excludeTokyo));
+      return filtered.sort((a, b) => {
+        const score = (t) => {
+          let s = 0;
+          if (state.verifiedDirectHubs.has(t)) s += 8;
+          if (PRIORITY_BRIDGE_HUBS.has(t)) s += 5;
+          if (isDateOrListTitle(t)) s -= 3;
+          return s;
+        };
+        return score(b) - score(a);
+      });
+    }
+
+    /**
+     * 候補リストの中から「本文リンクでゴールに到達する記事」を並列数2で裏取り検証
+     */
+    async function filterVerifiedGoalSources(candidates, maxNeeded, signal) {
+      const ordered = [...candidates].sort((a, b) => {
+        const score = (t) =>
+          (state.verifiedGoalSources.has(t) ? 10 : 0) +
+          (state.verifiedDirectHubs.has(t) ? 4 : 0) +
+          (isDateOrListTitle(t) ? -3 : 0);
+        return score(b) - score(a);
+      });
+
+      const verified = [];
+      const batchSize = 2;
+      for (let i = 0; i < ordered.length && verified.length < maxNeeded; i += batchSize) {
+        if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+        const batch = ordered.slice(i, i + batchSize);
+        const checks = await runWithConcurrency(
+          batch,
+          batchSize,
+          async (cand) => ({ title: cand, ok: await verifyCleanLinkToGoal(cand, signal) }),
+          signal
+        );
+        for (const item of checks) {
+          if (item.ok) {
+            verified.push(item.title);
+            if (verified.length >= maxNeeded) break;
+          }
+        }
+      }
+
+      return verified;
+    }
+
+    // =========================================================================
+    // メイン検索フロー（0〜4クリック・本文リンク限定）
+    // =========================================================================
+
+    function updateProgress(text, phase) {
+      if (text) el.progressText.textContent = text;
+      if (phase) el.progressPhase.textContent = phase;
+    }
+
+    function startProgressUI() {
+      state.isSearching = true;
+      state.apiCalls = 0;
+      state.scannedCount = 0;
+      state.searchStartTime = performance.now();
+
+      el.searchBtn.disabled = true;
+      el.randomBtn.disabled = true;
+      el.metricApiCalls.textContent = '0回';
+      el.metricScanned.textContent = '0件';
+      el.progressElapsed.textContent = '0.0秒';
+      el.progressPanel.classList.remove('hidden');
+      el.resultSection.classList.add('hidden');
+      hideMessage();
+
+      clearInterval(state.elapsedTimer);
+      state.elapsedTimer = setInterval(() => {
+        const sec = (performance.now() - state.searchStartTime) / 1000;
+        el.progressElapsed.textContent = `${sec.toFixed(1)}秒`;
+      }, 100);
+    }
+
+    function stopProgressUI() {
+      state.isSearching = false;
+      clearInterval(state.elapsedTimer);
+      state.elapsedTimer = null;
+      el.searchBtn.disabled = false;
+      el.randomBtn.disabled = false;
+      el.progressPanel.classList.add('hidden');
+    }
+
+    async function runRouteSearch(rawQuery) {
+      const query = (rawQuery || '').trim();
+      if (!query) {
+        showMessage('warning', 'キーワードを入力してください', '出発するWikipedia記事の名前やキーワードを入力してから検索ボタンを押してください。');
+        el.startInput.focus();
+        return;
+      }
+
+      closeSuggestions();
+
+      // 既存の検索が動いていれば中断
+      if (state.abortController) {
+        state.abortController.abort();
+      }
+      state.abortController = new AbortController();
+      const { signal } = state.abortController;
+      const excludeTokyoAtSearch = state.excludeTokyo;
+
+      startProgressUI();
+
+      try {
+        // ゴールキャッシュが未完了なら待機
+        if (!state.cacheReady) {
+          updateProgress('東京ヴェルディ周辺のリンクキャッシュを準備中...', '初期準備');
+          await initGoalCache();
+          if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+        }
+
+        // -----------------------------------------------------------------
+        // Step 0: 出発記事を解決
+        // -----------------------------------------------------------------
+        updateProgress(`「${query}」のWikipedia記事を確認中...`, '記事確認');
+        const resolved = await resolveStartArticle(query, signal);
+        if (!resolved) {
+          showMessage(
+            'warning',
+            '該当する記事が見つかりませんでした',
+            `「${query}」に該当する日本語版Wikipediaの記事が見つかりませんでした。別の表記やキーワードをお試しください。`
+          );
+          return;
+        }
+
+        const startTitle = resolved.title;
+        el.startInput.value = startTitle;
+        updateClearBtnVisibility();
+
+        // 0クリック判定（すでに東京ヴェルディ）
+        if (isGoalTitle(startTitle)) {
+          await finalizeSearchResult({
+            startTitle: state.canonicalGoal,
+            note: resolved.note,
+            excludeTokyo: excludeTokyoAtSearch,
+            routes: [[state.canonicalGoal]]
+          });
+          return;
+        }
+
+        // -----------------------------------------------------------------
+        // Step 1: 1クリック検索（出発記事の本文リンクを取得・脚注と一覧表を除外）
+        // -----------------------------------------------------------------
+        updateProgress(`「${startTitle}」の本文リンク（脚注・一覧除外）を解析中...`, '1クリック検索');
+        const startCleanSet = await getCleanBodyLinks(startTitle, signal);
+
+        for (const alias of state.goalAliases) {
+          if (startCleanSet.has(alias)) {
+            await finalizeSearchResult({
+              startTitle,
+              note: resolved.note,
+              excludeTokyo: excludeTokyoAtSearch,
+              routes: [[startTitle, state.canonicalGoal]]
+            });
+            return;
+          }
+        }
+
+        const allowedLevel1Links = Array.from(startCleanSet).filter(
+          (t) => t !== startTitle && !isGoalTitle(t) && !isExcludedIntermediate(t, excludeTokyoAtSearch)
+        );
+
+        if (allowedLevel1Links.length === 0) {
+          showMessage(
+            'warning',
+            '本文中にたどれるリンクが見つかりませんでした',
+            `「${startTitle}」の本文領域（脚注・一覧表を除く）に他のWikipedia記事へのリンクが見つかりませんでした。`
+          );
+          return;
+        }
+
+        // -----------------------------------------------------------------
+        // Step 2: 2クリック検索（出発 → [中継A] → 東京ヴェルディ）
+        // -----------------------------------------------------------------
+        updateProgress('2クリックで到達できるルートを照合・本文検証中...', '2クリック検索');
+
+        const twoHopCandidates = allowedLevel1Links.filter((t) => state.goalBacklinks.has(t));
+        if (twoHopCandidates.length > 0) {
+          const verifiedTwoHop = await filterVerifiedGoalSources(twoHopCandidates, 3, signal);
+          if (verifiedTwoHop.length > 0) {
+            const routes = verifiedTwoHop.map((mid) => [startTitle, mid, state.canonicalGoal]);
+            await finalizeSearchResult({
+              startTitle,
+              note: resolved.note,
+              excludeTokyo: excludeTokyoAtSearch,
+              routes
+            });
+            return;
+          }
+        }
+
+        // -----------------------------------------------------------------
+        // Step 3: 3クリック検索（出発 → [中継A] → [中継B] → 東京ヴェルディ）
+        // -----------------------------------------------------------------
+        const prioritizedL1 = prioritizeCandidates(allowedLevel1Links, excludeTokyoAtSearch);
+        const activeDirectHubs = Array.from(state.verifiedDirectHubs).filter(
+          (t) => !isExcludedIntermediate(t, excludeTokyoAtSearch)
+        );
+
+        const verifyThreeHopPairs = async (pairs, maxPairsToCheck, maxRoutesNeeded) => {
+          const verifiedRoutes = [];
+          const usedRouteKey = new Set();
+          const limit = Math.min(pairs.length, maxPairsToCheck);
+
+          for (let i = 0; i < limit && verifiedRoutes.length < maxRoutesNeeded; i += 2) {
+            if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+            const batch = pairs.slice(i, i + 2);
+
+            const checks = await runWithConcurrency(
+              batch,
+              2,
+              async (pair) => {
+                try {
+                  const cleanA = await getCleanBodyLinks(pair.midA, signal);
+                  if (!cleanA.has(pair.midB)) return null;
+                  const okGoal = await verifyCleanLinkToGoal(pair.midB, signal);
+                  return okGoal ? [startTitle, pair.midA, pair.midB, state.canonicalGoal] : null;
+                } catch (e) {
+                  if (e.name === 'AbortError' || e.isRateLimit) throw e;
+                  return null;
+                }
+              },
+              signal
+            );
+
+            for (const route of checks) {
+              if (!route) continue;
+              const key = route.join('->');
+              if (!usedRouteKey.has(key)) {
+                usedRouteKey.add(key);
+                verifiedRoutes.push(route);
+                if (verifiedRoutes.length >= maxRoutesNeeded) break;
+              }
+            }
+          }
+          return verifiedRoutes;
+        };
+
+        // Phase 3A: pltitles を使い、1回のAPI呼び出しで最大50件の中継候補と主要ハブを高速照合
+        if (activeDirectHubs.length > 0) {
+          updateProgress('3クリックルートを高速照合中（主要ハブ経由）...', '3クリック検索');
+          const fastL1 = prioritizedL1.slice(0, 50);
+          const hubMatchMap = await batchCheckLinksToTargets(fastL1, activeDirectHubs, signal);
+
+          const fastPairs = [];
+          const seenFast = new Set();
+          for (const midA of fastL1) {
+            const matchedHubs = hubMatchMap.get(midA) || [];
+            for (const midB of matchedHubs) {
+              if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
+              if (isExcludedIntermediate(midB, excludeTokyoAtSearch)) continue;
+              const pairKey = `${midA}>>>${midB}`;
+              if (!seenFast.has(pairKey)) {
+                seenFast.add(pairKey);
+                fastPairs.push({ midA, midB });
+              }
+            }
+          }
+
+          if (fastPairs.length > 0) {
+            updateProgress('3クリック候補の本文リンク（脚注・一覧除外）を検証中...', '3クリック検証');
+            fastPairs.sort((a, b) => {
+              const score = (p) =>
+                (PRIORITY_BRIDGE_HUBS.has(p.midA) ? 2 : 0) +
+                (isDateOrListTitle(p.midA) ? -2 : 0) +
+                (isDateOrListTitle(p.midB) ? -2 : 0);
+              return score(b) - score(a);
+            });
+
+            const verifiedFastRoutes = await verifyThreeHopPairs(fastPairs, 12, 3);
+            if (verifiedFastRoutes.length > 0) {
+              await finalizeSearchResult({
+                startTitle,
+                note: resolved.note,
+                excludeTokyo: excludeTokyoAtSearch,
+                routes: verifiedFastRoutes
+              });
+              return;
+            }
+          }
+        }
+
+        // Phase 3B: ハブ以外（一般被リンク）を経由する3クリックルートをフォールバック検索
+        updateProgress('3クリックルートを検索中（中継記事のリンクを展開）...', '3クリック検索');
+
+        const l1ToExpand = prioritizedL1.slice(0, 30);
+        const l1OutgoingMap = await batchFetchOutgoingLinks(l1ToExpand, signal);
+
+        const threeHopCandidatePairs = [];
+        const seenMidB = new Set();
+
+        for (const midA of l1ToExpand) {
+          const outLinks = l1OutgoingMap.get(midA) || [];
+          for (const midB of outLinks) {
+            if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
+            if (isExcludedIntermediate(midB, excludeTokyoAtSearch)) continue;
+
+            if (state.goalBacklinks.has(midB)) {
+              const pairKey = `${midA}>>>${midB}`;
+              if (!seenMidB.has(pairKey)) {
+                seenMidB.add(pairKey);
+                threeHopCandidatePairs.push({ midA, midB });
+              }
+            }
+          }
+        }
+
+        if (threeHopCandidatePairs.length > 0) {
+          updateProgress('3クリック候補の本文リンク（脚注・一覧除外）を検証中...', '3クリック検証');
+          threeHopCandidatePairs.sort((a, b) => {
+            const score = (p) =>
+              (state.verifiedDirectHubs.has(p.midB) ? 4 : 0) +
+              (PRIORITY_BRIDGE_HUBS.has(p.midA) ? 2 : 0) +
+              (isDateOrListTitle(p.midA) ? -2 : 0) +
+              (isDateOrListTitle(p.midB) ? -2 : 0);
+            return score(b) - score(a);
+          });
+
+          const verifiedThreeHopRoutes = await verifyThreeHopPairs(threeHopCandidatePairs, 16, 3);
+          if (verifiedThreeHopRoutes.length > 0) {
+            await finalizeSearchResult({
+              startTitle,
+              note: resolved.note,
+              excludeTokyo: excludeTokyoAtSearch,
+              routes: verifiedThreeHopRoutes
+            });
+            return;
+          }
+        }
+
+        // -----------------------------------------------------------------
+        // Step 4: 4クリック検索（出発 → [A] → [B] → [C] → 東京ヴェルディ）
+        // -----------------------------------------------------------------
+        updateProgress('4クリックルートを検索中（主要ハブを経由して検索）...', '4クリック検索');
+
+        const topMidAs = l1ToExpand.slice(0, 12);
+        const l2ParentMap = new Map();
+        const l2Candidates = [];
+
+        for (const midA of topMidAs) {
+          const outA = l1OutgoingMap.get(midA) || [];
+          for (const midB of outA) {
+            if (midB === startTitle || midB === midA || isGoalTitle(midB)) continue;
+            if (isExcludedIntermediate(midB, excludeTokyoAtSearch)) continue;
+            if (!l2ParentMap.has(midB)) {
+              l2ParentMap.set(midB, midA);
+              l2Candidates.push(midB);
+            }
+          }
+        }
+
+        const prioritizedL2 = prioritizeCandidates(l2Candidates, excludeTokyoAtSearch).slice(0, 50);
+        const fourHopCandidates = [];
+
+        if (prioritizedL2.length > 0 && activeDirectHubs.length > 0) {
+          const l2HubMap = await batchCheckLinksToTargets(prioritizedL2, activeDirectHubs, signal);
+          for (const midB of prioritizedL2) {
+            const midA = l2ParentMap.get(midB);
+            const matchedC = l2HubMap.get(midB) || [];
+            for (const midC of matchedC) {
+              if (midC === startTitle || midC === midA || midC === midB || isGoalTitle(midC)) continue;
+              if (isExcludedIntermediate(midC, excludeTokyoAtSearch)) continue;
+              fourHopCandidates.push({ midA, midB, midC });
+              if (fourHopCandidates.length >= 16) break;
+            }
+            if (fourHopCandidates.length >= 16) break;
+          }
+        }
+
+        if (fourHopCandidates.length === 0 && prioritizedL2.length > 0) {
+          const l2Sample = prioritizedL2.slice(0, 20);
+          const l2OutgoingMap = await batchFetchOutgoingLinks(l2Sample, signal);
+          for (const midB of l2Sample) {
+            const midA = l2ParentMap.get(midB);
+            const outB = l2OutgoingMap.get(midB) || [];
+            for (const midC of outB) {
+              if (midC === startTitle || midC === midA || midC === midB || isGoalTitle(midC)) continue;
+              if (isExcludedIntermediate(midC, excludeTokyoAtSearch)) continue;
+              if (state.goalBacklinks.has(midC)) {
+                fourHopCandidates.push({ midA, midB, midC });
+                if (fourHopCandidates.length >= 16) break;
+              }
+            }
+            if (fourHopCandidates.length >= 16) break;
+          }
+        }
+
+        if (fourHopCandidates.length > 0) {
+          updateProgress('4クリック候補の本文リンクを検証中...', '4クリック検証');
+
+          const verifiedFourHopRoutes = [];
+          const usedKeys = new Set();
+
+          for (let i = 0; i < fourHopCandidates.length && verifiedFourHopRoutes.length < 2; i += 2) {
+            if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+            const batch = fourHopCandidates.slice(i, i + 2);
+            const checks = await runWithConcurrency(
+              batch,
+              2,
+              async (cand) => {
+                try {
+                  const cleanA = await getCleanBodyLinks(cand.midA, signal);
+                  if (!cleanA.has(cand.midB)) return null;
+                  const cleanB = await getCleanBodyLinks(cand.midB, signal);
+                  if (!cleanB.has(cand.midC)) return null;
+                  const okGoal = await verifyCleanLinkToGoal(cand.midC, signal);
+                  return okGoal
+                    ? [startTitle, cand.midA, cand.midB, cand.midC, state.canonicalGoal]
+                    : null;
+                } catch (e) {
+                  if (e.name === 'AbortError' || e.isRateLimit) throw e;
+                  return null;
+                }
+              },
+              signal
+            );
+
+            for (const route of checks) {
+              if (!route) continue;
+              const key = route.join('->');
+              if (!usedKeys.has(key)) {
+                usedKeys.add(key);
+                verifiedFourHopRoutes.push(route);
+                if (verifiedFourHopRoutes.length >= 2) break;
+              }
+            }
+          }
+
+          if (verifiedFourHopRoutes.length > 0) {
+            await finalizeSearchResult({
+              startTitle,
+              note: resolved.note,
+              excludeTokyo: excludeTokyoAtSearch,
+              routes: verifiedFourHopRoutes
+            });
+            return;
+          }
+        }
+
+        // 4クリック以内で見つからなかった場合
+        const excludeText = excludeTokyoAtSearch ? '（「東京都」も除外）' : '';
+        showMessage(
+          'warning',
+          '4クリック以内のルートが見つかりませんでした',
+          `「${startTitle}」から本文リンク限定${excludeText}で4クリック以内に「${state.canonicalGoal}」へ到達する経路を発見できませんでした。${excludeTokyoAtSearch ? '「「東京都」を除外」をOFFにするか、' : ''}別のキーワードをお試しください。`
+        );
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          showMessage('info', '検索をキャンセルしました', '別のキーワードを入力してもう一度検索できます。');
+        } else if (err.isRateLimit) {
+          console.error('検索エラー (レート制限):', err);
+          showMessage(
+            'warning',
+            'Wikipediaへのアクセスが混み合っています（HTTP 429）',
+            '短時間に多くのAPIリクエストが送信されたため、Wikipedia側で一時的に制限がかかりました。10〜20秒ほど待ってからもう一度検索をお試しください。'
+          );
+        } else {
+          console.error('検索エラー:', err);
+          showMessage(
+            'error',
+            '検索中にエラーが発生しました',
+            `Wikipediaとの通信中に問題が発生しました（${err.message}）。少し待ってから再度お試しください。`
+          );
+        }
+      } finally {
+        stopProgressUI();
+      }
+    }
+
+    // =========================================================================
+    // 記事メタデータ取得 & 結果レンダリング
+    // =========================================================================
+
+    async function fetchArticleSummaries(titles) {
+      const unique = Array.from(new Set(titles)).filter((t) => !state.articleInfoCache.has(t));
+      if (unique.length === 0) return;
+
+      try {
+        const data = await wikiFetch(
+          {
+            action: 'query',
+            titles: unique.join('|'),
+            prop: 'pageimages|extracts',
+            pithumbsize: '160',
+            exintro: '1',
+            explaintext: '1',
+            exsentences: '2',
+            redirects: '1'
+          },
+          null,
+          false
+        );
+
+        const pages = data?.query?.pages || [];
+        const byTitle = new Map();
+        for (const p of pages) {
+          byTitle.set(p.title, {
+            title: p.title,
+            extract: (p.extract || '').trim() || 'Wikipediaの記事ページで詳細を確認できます。',
+            thumbnail: p.thumbnail?.source || null,
+            url: wikiArticleUrl(p.title)
+          });
+        }
+
+        const redirects = new Map();
+        for (const r of data?.query?.redirects || []) {
+          redirects.set(r.from, r.to);
+        }
+
+        for (const t of unique) {
+          const target = redirects.get(t) || t;
+          const info = byTitle.get(target) || {
+            title: t,
+            extract: 'Wikipediaの記事ページで詳細を確認できます。',
+            thumbnail: null,
+            url: wikiArticleUrl(t)
+          };
+          state.articleInfoCache.set(t, info);
+        }
+      } catch (err) {
+        console.warn('記事概要の取得に失敗（フォールバック表示）:', err);
+      }
+    }
+
+    async function finalizeSearchResult({ startTitle, note, excludeTokyo, routes }) {
+      updateProgress('見つかったルートの記事情報を取得中...', '結果表示');
+
+      const allTitles = routes.flat();
+      await fetchArticleSummaries(allTitles);
+
+      state.currentResult = {
+        startTitle,
+        note: note || '',
+        excludeTokyo: Boolean(excludeTokyo),
+        routes,
+        selectedIndex: 0
+      };
+
+      renderCurrentResult();
+      saveToHistory(state.currentResult);
+    }
+
+    function renderCurrentResult() {
+      const res = state.currentResult;
+      if (!res || !res.routes || res.routes.length === 0) return;
+
+      const route = res.routes[res.selectedIndex] || res.routes[0];
+      const clicks = Math.max(0, route.length - 1);
+
+      el.resultClicksBadge.textContent = clicks === 0 ? '0クリック（ゴール記事そのもの！）' : `${clicks}クリックで到達！`;
+      if (res.excludeTokyo) {
+        el.resultExcludeBadge.classList.remove('hidden');
+      } else {
+        el.resultExcludeBadge.classList.add('hidden');
+      }
+
+      el.resultHeadline.textContent = clicks === 0
+        ? `「${res.startTitle}」はゴール記事そのものです！`
+        : `「${res.startTitle}」から ${clicks}クリック で東京ヴェルディへ到達`;
+
+      if (res.note) {
+        el.resultSubnote.textContent = res.note;
+        el.resultSubnote.classList.remove('hidden');
+      } else {
+        el.resultSubnote.classList.add('hidden');
+      }
+
+      el.resultPathSummary.textContent = route.join(' → ');
+
+      // 別ルート切り替えボタン
+      if (res.routes.length > 1) {
+        el.altRoutesBar.classList.remove('hidden');
+        el.altRoutesButtons.innerHTML = res.routes
+          .map((_, idx) => {
+            const active = idx === res.selectedIndex;
+            const cls = active
+              ? 'bg-verdy-600 text-white border-verdy-600 shadow-sm'
+              : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100';
+            return `<button type="button" data-route-idx="${idx}" class="px-3 py-1.5 rounded-lg border text-xs font-bold transition cursor-pointer ${cls}">ルート ${idx + 1}</button>`;
+          })
+          .join('');
+      } else {
+        el.altRoutesBar.classList.add('hidden');
+      }
+
+      // ルートカード描画
+      const cardsHtml = route
+        .map((title, idx) => {
+          const info = state.articleInfoCache.get(title) || {
+            title,
+            extract: 'Wikipediaの記事ページで詳細を確認できます。',
+            thumbnail: null,
+            url: wikiArticleUrl(title)
+          };
+
+          const isStart = idx === 0;
+          const isGoal = idx === route.length - 1;
+
+          let stepBadge = '';
+          let cardBorder = 'border-slate-200/90 hover:border-verdy-300';
+          if (isStart && isGoal) {
+            stepBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-gold-500 text-verdy-950">GOAL</span>';
+            cardBorder = 'border-gold-400 bg-verdy-50/40';
+          } else if (isStart) {
+            stepBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-slate-800 text-white">START</span>';
+          } else if (isGoal) {
+            stepBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-verdy-600 text-white">GOAL</span>';
+            cardBorder = 'border-verdy-400 bg-verdy-50/40';
+          } else {
+            stepBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-verdy-100 text-verdy-800">${idx}クリック目</span>`;
+          }
+
+          const thumbHtml = info.thumbnail
+            ? `<img src="${escapeHtml(info.thumbnail)}" alt="${escapeHtml(title)}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover bg-slate-100 border border-slate-200/70 shrink-0" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+               <div class="hidden w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-verdy-50 border border-verdy-100 text-verdy-700 items-center justify-center shrink-0">
+                 <svg class="w-7 h-7 opacity-60" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+               </div>`
+            : `<div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-verdy-50 border border-verdy-100 text-verdy-700 flex items-center justify-center shrink-0">
+                 <svg class="w-7 h-7 opacity-60" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+               </div>`;
+
+          const connectorHtml = !isGoal
+            ? `<div class="flex justify-center py-0.5" aria-hidden="true">
+                 <div class="inline-flex items-center gap-1.5 text-verdy-600/80 text-xs font-bold">
+                   <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                   </svg>
+                 </div>
+               </div>`
+            : '';
+
+          return `
+            <a href="${escapeHtml(info.url)}" target="_blank" rel="noopener noreferrer"
+               class="block bg-white rounded-2xl border p-4 shadow-sm hover:shadow-md transition ${cardBorder}">
+              <div class="flex items-start gap-3.5">
+                ${thumbHtml}
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-2 mb-1">
+                    ${stepBadge}
+                    <span class="text-[11px] text-slate-400 font-medium inline-flex items-center gap-0.5 ml-auto">
+                      Wikipediaで開く
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </span>
+                  </div>
+                  <h3 class="text-base sm:text-lg font-extrabold text-slate-900 break-words leading-snug">
+                    ${escapeHtml(title)}
+                  </h3>
+                  <p class="mt-1 text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                    ${escapeHtml(info.extract)}
+                  </p>
+                </div>
+              </div>
+            </a>
+            ${connectorHtml}
+          `;
+        })
+        .join('');
+
+      el.routeCardsContainer.innerHTML = cardsHtml;
+      el.resultSection.classList.remove('hidden');
+    }
+
+    // =========================================================================
+    // シェア・コピー機能（公開URL自動付与対応）
+    // =========================================================================
+
+    function buildShareText(includeUrlInline) {
+      const res = state.currentResult;
+      if (!res || !res.routes || res.routes.length === 0) return '';
+      const route = res.routes[res.selectedIndex] || res.routes[0];
+      const clicks = Math.max(0, route.length - 1);
+      const modeLine = res.excludeTokyo ? '（※「東京都」除外モード）\n' : '';
+      const header = clicks === 0
+        ? `「${res.startTitle}」は0クリックで東京ヴェルディ！`
+        : `「${res.startTitle}」から${clicks}クリックで東京ヴェルディに到達！`;
+
+      const lines = [
+        header,
+        `${modeLine}${route.join(' → ')}`,
+        '',
+        '#東京ヴェルディ #東京ヴェルディへの最短ルート検索'
+      ];
+
+      if (includeUrlInline) {
+        const publicUrl = getPublicUrl();
+        if (publicUrl) {
+          lines.push(publicUrl);
+        }
+      }
+
+      return lines.join('\n');
+    }
+
+    function copyCurrentResult() {
+      const text = buildShareText(true);
+      if (!text) return;
+
+      let copied = false;
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.top = '-9999px';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        textarea.setSelectionRange(0, text.length);
+        copied = document.execCommand('copy');
+        document.body.removeChild(textarea);
+      } catch (err) {
+        console.warn('execCommandコピー失敗:', err);
+      }
+
+      if (copied) {
+        el.copyResultBtnLabel.textContent = 'コピーしました！';
+        clearTimeout(copyLabelTimer);
+        copyLabelTimer = setTimeout(() => {
+          el.copyResultBtnLabel.textContent = '結果をコピー';
+        }, 2000);
+        showToast('検索結果をクリップボードにコピーしました');
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          el.copyResultBtnLabel.textContent = 'コピーしました！';
+          clearTimeout(copyLabelTimer);
+          copyLabelTimer = setTimeout(() => {
+            el.copyResultBtnLabel.textContent = '結果をコピー';
+          }, 2000);
+          showToast('検索結果をクリップボードにコピーしました');
+        }).catch(() => {
+          showToast('コピーに失敗しました');
+        });
+      } else {
+        showToast('コピーに失敗しました');
+      }
+    }
+
+    function shareResultOnX() {
+      const text = buildShareText(false);
+      if (!text) return;
+
+      const intentUrl = new URL('https://x.com/intent/tweet');
+      intentUrl.searchParams.set('text', text);
+
+      const publicUrl = getPublicUrl();
+      if (publicUrl) {
+        intentUrl.searchParams.set('url', publicUrl);
+      }
+
+      window.open(intentUrl.toString(), '_blank', 'noopener,noreferrer');
+    }
+
+    // =========================================================================
+    // 入力補完（OpenSearchサジェスト）・プリセット・ランダム・履歴
+    // =========================================================================
+
+    function closeSuggestions() {
+      el.suggestList.classList.add('hidden');
+      el.suggestList.innerHTML = '';
+      state.suggestItems = [];
+      state.suggestActiveIndex = -1;
+    }
+
+    function renderSuggestions(items) {
+      state.suggestItems = items;
+      state.suggestActiveIndex = -1;
+
+      if (!items || items.length === 0) {
         closeSuggestions();
-        findShortestPathToVerdy(val);
+        return;
+      }
+
+      el.suggestList.innerHTML = items
+        .map(
+          (title, idx) => `
+          <li role="option" data-suggest-idx="${idx}"
+              class="px-4 py-2.5 text-sm text-slate-800 hover:bg-verdy-50 hover:text-verdy-800 cursor-pointer flex items-center justify-between gap-2 transition">
+            <span class="font-medium truncate">${escapeHtml(title)}</span>
+            <span class="text-[11px] text-slate-400 shrink-0">記事</span>
+          </li>`
+        )
+        .join('');
+      el.suggestList.classList.remove('hidden');
+    }
+
+    async function fetchSuggestions(query) {
+      const q = query.trim();
+      if (q.length < 1) {
+        closeSuggestions();
+        return;
+      }
+      try {
+        const data = await wikiFetch(
+          {
+            action: 'opensearch',
+            search: q,
+            namespace: '0',
+            limit: '7'
+          },
+          null,
+          false
+        );
+        const titles = Array.isArray(data) && Array.isArray(data[1]) ? data[1] : [];
+        if (el.startInput.value.trim() === q && !state.isSearching) {
+          renderSuggestions(titles);
+        }
+      } catch {
+        // サジェスト失敗時は静かに無視
+      }
+    }
+
+    async function runRandomArticleSearch() {
+      if (state.isSearching) return;
+      try {
+        el.randomBtn.disabled = true;
+        const data = await wikiFetch(
+          {
+            action: 'query',
+            list: 'random',
+            rnnamespace: '0',
+            rnlimit: '1'
+          },
+          null,
+          false
+        );
+        const randomTitle = data?.query?.random?.[0]?.title;
+        if (randomTitle) {
+          el.startInput.value = randomTitle;
+          updateClearBtnVisibility();
+          await runRouteSearch(randomTitle);
+        }
+      } catch (err) {
+        showMessage('error', 'ランダム記事の取得に失敗しました', err.message || '通信状況を確認してもう一度お試しください。');
+      } finally {
+        if (!state.isSearching) el.randomBtn.disabled = false;
+      }
+    }
+
+    function updateExcludeTokyoButtonUI() {
+      const isOn = state.excludeTokyo;
+      el.excludeTokyoBtn.setAttribute('aria-checked', String(isOn));
+
+      if (isOn) {
+        el.excludeTokyoBtn.className = 'inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition cursor-pointer select-none bg-verdy-50 border-verdy-300 text-verdy-800';
+        el.excludeTokyoTrack.className = 'relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-verdy-600';
+        el.excludeTokyoKnob.style.transform = 'translateX(18px)';
+      } else {
+        el.excludeTokyoBtn.className = 'inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition cursor-pointer select-none bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100';
+        el.excludeTokyoTrack.className = 'relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-slate-300';
+        el.excludeTokyoKnob.style.transform = 'translateX(2px)';
+      }
+    }
+
+    function updateClearBtnVisibility() {
+      if (el.startInput.value.length > 0) {
+        el.clearInputBtn.classList.remove('hidden');
+      } else {
+        el.clearInputBtn.classList.add('hidden');
+      }
+    }
+
+    function initPresets() {
+      el.presetContainer.innerHTML = PRESET_KEYWORDS.map(
+        (kw) => `
+          <button type="button" data-preset="${escapeHtml(kw)}"
+                  class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-verdy-100 hover:text-verdy-800 text-slate-700 text-xs sm:text-sm font-semibold transition cursor-pointer">
+            ${escapeHtml(kw)}
+          </button>`
+      ).join('');
+    }
+
+    // 履歴の読み込み・保存・描画
+    function loadHistory() {
+      try {
+        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        state.history = Array.isArray(parsed) ? parsed.slice(0, 12) : [];
+      } catch {
+        state.history = [];
+      }
+      renderHistory();
+    }
+
+    function saveToHistory(result) {
+      const route = result.routes[0];
+      if (!route || route.length === 0) return;
+
+      const entry = {
+        startTitle: result.startTitle,
+        clicks: Math.max(0, route.length - 1),
+        route,
+        excludeTokyo: result.excludeTokyo,
+        timestamp: Date.now()
+      };
+
+      state.history = [
+        entry,
+        ...state.history.filter(
+          (item) => !(item.startTitle === entry.startTitle && item.excludeTokyo === entry.excludeTokyo)
+        )
+      ].slice(0, 12);
+
+      try {
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(state.history));
+      } catch {
+        // localStorage利用不可環境では無視
+      }
+      renderHistory();
+    }
+
+    function formatHistoryTime(ts) {
+      try {
+        const d = new Date(ts);
+        const m = d.getMonth() + 1;
+        const day = d.getDate();
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        return `${m}/${day} ${hh}:${mm}`;
+      } catch {
+        return '';
+      }
+    }
+
+    function renderHistory() {
+      if (!state.history || state.history.length === 0) {
+        el.historySection.classList.add('hidden');
+        return;
+      }
+
+      el.historySection.classList.remove('hidden');
+      el.historyList.innerHTML = state.history
+        .map(
+          (item, idx) => `
+          <button type="button" data-history-idx="${idx}"
+                  class="w-full text-left py-3 px-2 -mx-2 rounded-xl hover:bg-slate-50 transition flex items-start justify-between gap-3 cursor-pointer">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="font-bold text-sm text-slate-800">${escapeHtml(item.startTitle)}</span>
+                <span class="text-[11px] font-bold bg-verdy-100 text-verdy-800 px-2 py-0.5 rounded-full">${item.clicks}クリック</span>
+                ${item.excludeTokyo ? '<span class="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">「東京都」除外</span>' : ''}
+              </div>
+              <p class="text-xs text-slate-500 mt-1 truncate">${escapeHtml((item.route || []).join(' → '))}</p>
+            </div>
+            <span class="text-[11px] text-slate-400 shrink-0 font-mono mt-0.5">${escapeHtml(formatHistoryTime(item.timestamp))}</span>
+          </button>`
+        )
+        .join('');
+    }
+
+    // =========================================================================
+    // イベント登録
+    // =========================================================================
+
+    function bindEvents() {
+      el.searchForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        runRouteSearch(el.startInput.value);
       });
 
-      // 入力補完（デバウンス）
       el.startInput.addEventListener('input', () => {
+        updateClearBtnVisibility();
+        clearTimeout(state.suggestTimer);
         const val = el.startInput.value;
-        el.clearInputBtn.classList.toggle('hidden', val.length === 0);
-        clearTimeout(state.acTimer);
-        state.acTimer = setTimeout(() => fetchSuggestions(val), 240);
+        state.suggestTimer = setTimeout(() => fetchSuggestions(val), 220);
       });
 
-      // キーボード操作（候補選択）
       el.startInput.addEventListener('keydown', (e) => {
-        if (el.suggestionsList.classList.contains('hidden')) return;
+        if (el.suggestList.classList.contains('hidden') || state.suggestItems.length === 0) return;
+
         if (e.key === 'ArrowDown') {
           e.preventDefault();
-          highlightSuggestion(state.acIndex + 1);
+          state.suggestActiveIndex = (state.suggestActiveIndex + 1) % state.suggestItems.length;
+          highlightSuggestItem();
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
-          highlightSuggestion(state.acIndex - 1);
-        } else if (e.key === 'Enter' && state.acIndex >= 0 && state.acItems[state.acIndex]) {
+          state.suggestActiveIndex = (state.suggestActiveIndex - 1 + state.suggestItems.length) % state.suggestItems.length;
+          highlightSuggestItem();
+        } else if (e.key === 'Enter' && state.suggestActiveIndex >= 0) {
           e.preventDefault();
-          selectSuggestion(state.acItems[state.acIndex]);
+          const chosen = state.suggestItems[state.suggestActiveIndex];
+          el.startInput.value = chosen;
+          updateClearBtnVisibility();
+          closeSuggestions();
+          runRouteSearch(chosen);
         } else if (e.key === 'Escape') {
           closeSuggestions();
         }
       });
 
-      // 入力クリア
       el.clearInputBtn.addEventListener('click', () => {
         el.startInput.value = '';
-        el.clearInputBtn.classList.add('hidden');
+        updateClearBtnVisibility();
         closeSuggestions();
         el.startInput.focus();
       });
 
-      // 外側クリックで候補を閉じる
+      el.suggestList.addEventListener('click', (e) => {
+        const li = e.target.closest('li[data-suggest-idx]');
+        if (!li) return;
+        const idx = parseInt(li.dataset.suggestIdx, 10);
+        const title = state.suggestItems[idx];
+        if (title) {
+          el.startInput.value = title;
+          updateClearBtnVisibility();
+          closeSuggestions();
+          runRouteSearch(title);
+        }
+      });
+
       document.addEventListener('click', (e) => {
-        if (!el.startInput.contains(e.target) && !el.suggestionsList.contains(e.target)) {
+        if (!el.suggestList.contains(e.target) && e.target !== el.startInput) {
           closeSuggestions();
         }
       });
 
-      // 検索キャンセル
+      el.excludeTokyoBtn.addEventListener('click', () => {
+        state.excludeTokyo = !state.excludeTokyo;
+        updateExcludeTokyoButtonUI();
+        showToast(state.excludeTokyo ? '「東京都」を除外：ON' : '「東京都」を除外：OFF');
+
+        // すでに結果が表示されていて検索中でなければ、新設定で自動再検索
+        if (!state.isSearching && state.currentResult && state.currentResult.startTitle) {
+          runRouteSearch(state.currentResult.startTitle);
+        }
+      });
+
+      el.randomBtn.addEventListener('click', () => {
+        runRandomArticleSearch();
+      });
+
+      el.presetContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-preset]');
+        if (!btn) return;
+        const kw = btn.dataset.preset;
+        el.startInput.value = kw;
+        updateClearBtnVisibility();
+        runRouteSearch(kw);
+      });
+
       el.cancelBtn.addEventListener('click', () => {
         if (state.abortController) {
           state.abortController.abort();
         }
       });
 
-      // ランダム記事
-      el.randomBtn.addEventListener('click', tryRandomArticle);
-
-      // 結果コピー
       el.copyResultBtn.addEventListener('click', copyCurrentResult);
-
-      // X(旧Twitter)シェア
       el.shareXBtn.addEventListener('click', shareResultOnX);
 
-      // 履歴クリア
+      el.altRoutesButtons.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-route-idx]');
+        if (!btn || !state.currentResult) return;
+        const idx = parseInt(btn.dataset.routeIdx, 10);
+        if (!Number.isNaN(idx) && state.currentResult.routes[idx]) {
+          state.currentResult.selectedIndex = idx;
+          renderCurrentResult();
+        }
+      });
+
+      el.historyList.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-history-idx]');
+        if (!btn) return;
+        const idx = parseInt(btn.dataset.historyIdx, 10);
+        const item = state.history[idx];
+        if (!item) return;
+
+        el.startInput.value = item.startTitle;
+        updateClearBtnVisibility();
+        if (typeof item.excludeTokyo === 'boolean' && state.excludeTokyo !== item.excludeTokyo) {
+          state.excludeTokyo = item.excludeTokyo;
+          updateExcludeTokyoButtonUI();
+        }
+        runRouteSearch(item.startTitle);
+      });
+
       el.clearHistoryBtn.addEventListener('click', () => {
         state.history = [];
-        saveHistory();
+        try {
+          localStorage.removeItem(HISTORY_STORAGE_KEY);
+        } catch {
+          // 無視
+        }
         renderHistory();
         showToast('検索履歴をクリアしました');
+      });
+    }
+
+    function highlightSuggestItem() {
+      const nodes = el.suggestList.querySelectorAll('li[data-suggest-idx]');
+      nodes.forEach((node, idx) => {
+        if (idx === state.suggestActiveIndex) {
+          node.classList.add('bg-verdy-50', 'text-verdy-800');
+        } else {
+          node.classList.remove('bg-verdy-50', 'text-verdy-800');
+        }
       });
     }
 
     // 起動処理
     window.addEventListener('DOMContentLoaded', () => {
       initPresets();
+      updateExcludeTokyoButtonUI();
       loadHistory();
       bindEvents();
       initGoalCache();
