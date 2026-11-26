@@ -229,16 +229,6 @@
           <div class="text-xs font-semibold text-slate-500 mb-2">人気のキーワードで試す：</div>
           <div id="presetContainer" class="flex flex-wrap gap-2"></div>
         </div>
-
-        <!-- ルール注記 -->
-        <div class="flex items-start gap-2 rounded-xl bg-verdy-50/70 border border-verdy-100 px-3.5 py-2.5 text-xs text-verdy-900/90 leading-relaxed">
-          <svg class="w-4 h-4 text-verdy-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>
-            <strong>本文リンク限定ルール：</strong>記事内の脚注（出典・注釈）および下部の折りたたみ一覧表（ナビゲーションボックス／テンプレート）のリンクは常に除外して検索します。
-          </span>
-        </div>
       </form>
     </section>
 
@@ -424,8 +414,8 @@
             起動時に「東京ヴェルディ1969」への被リンクと主要ハブ記事をキャッシュし、出発記事からの発リンクと両側から照合することで、最大4クリック以内の最短ルートを検索します。
           </p>
           <p>
-            <strong>3. 本文リンク限定（脚注・折りたたみ一覧表を常時除外）：</strong>
-            WikipediaのWikitext構造を解析し、「脚注」「注釈」「出典」「参考文献」セクションや、記事下部の折りたたみ一覧表（ナビゲーションボックス／テンプレート）に含まれるリンクはすべて除外した上で、本文中のリンクだけでつながる経路を検証しています。
+            <strong>3. 本文リンク限定ルール（脚注・折りたたみ一覧表を常時除外）：</strong>
+            記事内の脚注（出典・注釈・参考文献）および下部の折りたたみ一覧表（ナビゲーションボックス／テンプレート）のリンクは常に除外し、WikipediaのWikitext構造を解析して本文中のリンクだけでつながる経路を検証しています。
           </p>
           <p>
             <strong>4. 「国名・地名を除外」設定：</strong>
